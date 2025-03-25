@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.movierating.db.mappers.MovieMapper">
+  <resultMap id="BaseResultMap" type="com.example.movierating.db.po.Movie">
+    <id column="movie_id" jdbcType="INTEGER" property="movieId" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="director" jdbcType="VARCHAR" property="director" />
+    <result column="release_date" jdbcType="DATE" property="releaseDate" />
+    <result column="poster_url" jdbcType="VARCHAR" property="posterUrl" />
+    <result column="genre" jdbcType="VARCHAR" property="genre" />
+    <result column="duration" jdbcType="INTEGER" property="duration" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.example.movierating.db.po.Movie">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    movie_id, title, director, release_date, poster_url, genre, duration, country, create_date, 
+    update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from Movie
+    where movie_id = #{movieId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from Movie
+    where movie_id = #{movieId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.movierating.db.po.Movie">
+    insert into Movie (movie_id, title, director, 
+      release_date, poster_url, genre, 
+      duration, country, create_date, 
+      update_date, description)
+    values (#{movieId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{director,jdbcType=VARCHAR}, 
+      #{releaseDate,jdbcType=DATE}, #{posterUrl,jdbcType=VARCHAR}, #{genre,jdbcType=VARCHAR}, 
+      #{duration,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.movierating.db.po.Movie">
+    insert into Movie
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="movieId != null">
+        movie_id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="director != null">
+        director,
+      </if>
+      <if test="releaseDate != null">
+        release_date,
+      </if>
+      <if test="posterUrl != null">
+        poster_url,
+      </if>
+      <if test="genre != null">
+        genre,
+      </if>
+      <if test="duration != null">
+        duration,
+      </if>
+      <if test="country != null">
+        country,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="movieId != null">
+        #{movieId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="director != null">
+        #{director,jdbcType=VARCHAR},
+      </if>
+      <if test="releaseDate != null">
+        #{releaseDate,jdbcType=DATE},
+      </if>
+      <if test="posterUrl != null">
+        #{posterUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="genre != null">
+        #{genre,jdbcType=VARCHAR},
+      </if>
+      <if test="duration != null">
+        #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="country != null">
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.movierating.db.po.Movie">
+    update Movie
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="director != null">
+        director = #{director,jdbcType=VARCHAR},
+      </if>
+      <if test="releaseDate != null">
+        release_date = #{releaseDate,jdbcType=DATE},
+      </if>
+      <if test="posterUrl != null">
+        poster_url = #{posterUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="genre != null">
+        genre = #{genre,jdbcType=VARCHAR},
+      </if>
+      <if test="duration != null">
+        duration = #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="country != null">
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where movie_id = #{movieId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.movierating.db.po.Movie">
+    update Movie
+    set title = #{title,jdbcType=VARCHAR},
+      director = #{director,jdbcType=VARCHAR},
+      release_date = #{releaseDate,jdbcType=DATE},
+      poster_url = #{posterUrl,jdbcType=VARCHAR},
+      genre = #{genre,jdbcType=VARCHAR},
+      duration = #{duration,jdbcType=INTEGER},
+      country = #{country,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where movie_id = #{movieId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.movierating.db.po.Movie">
+    update Movie
+    set title = #{title,jdbcType=VARCHAR},
+      director = #{director,jdbcType=VARCHAR},
+      release_date = #{releaseDate,jdbcType=DATE},
+      poster_url = #{posterUrl,jdbcType=VARCHAR},
+      genre = #{genre,jdbcType=VARCHAR},
+      duration = #{duration,jdbcType=INTEGER},
+      country = #{country,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where movie_id = #{movieId,jdbcType=INTEGER}
+  </update>
+</mapper>
