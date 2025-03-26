@@ -22,4 +22,5 @@ public interface MovieMapper {
 
     List<Movie> selectMovies(Integer offset, Integer limit);
 
+    List<Movie> searchMovies(String keywordPattern);
 }

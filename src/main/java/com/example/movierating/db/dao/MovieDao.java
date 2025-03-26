@@ -14,4 +14,7 @@ public interface MovieDao {
     int updateMovie(Movie movie);
 
     int deleteMovie(Integer movieId);
+
+    List<Movie> searchMovies(String keywordPattern);
+
 }

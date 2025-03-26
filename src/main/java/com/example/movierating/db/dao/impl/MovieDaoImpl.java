@@ -38,4 +38,9 @@ public class MovieDaoImpl implements MovieDao {
     public int deleteMovie(Integer movieId) {
         return movieMapper.deleteByPrimaryKey(movieId);
     }
+
+    @Override
+    public List<Movie> searchMovies(String keywordPattern) {
+        return movieMapper.searchMovies(keywordPattern);
+    }
 }

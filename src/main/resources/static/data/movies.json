@@ -1,0 +1,26 @@
+[
+  {
+    "movieId": 1,
+    "title": "Green Book",
+    "director": "Peter Farrelly",
+    "releaseDate": "2018-11-16",
+    "posterUrl": "/images/green_book.jpg",
+    "genre": "Drama",
+    "duration": 130,
+    "country": "USA",
+    "description": "A working-class Italian-American bouncer becomes the driver for an African-American classical pianist on a tour of venues through the 1960s American South.",
+    "rating": 8.2
+  },
+  {
+    "movieId": 2,
+    "title": "Inception",
+    "director": "Christopher Nolan",
+    "releaseDate": "2010-07-16",
+    "posterUrl": "/images/inception.jpg",
+    "genre": "Sci-Fi",
+    "duration": 148,
+    "country": "USA",
+    "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+    "rating": 8.8
+  }
+]

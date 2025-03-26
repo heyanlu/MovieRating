@@ -39,6 +39,24 @@
     from Movie
     LIMIT #{limit} OFFSET #{offset}
   </select>
+  <select id="searchMovies" resultType="com.example.movierating.db.po.Movie">
+    SELECT
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    FROM Movie
+    WHERE LOWER(title) LIKE #{keywordPattern}
+    OR LOWER(director) LIKE #{keywordPattern}
+    OR LOWER(genre) LIKE #{keywordPattern}
+    OR LOWER(description) LIKE #{keywordPattern}
+    ORDER BY
+    CASE
+    WHEN LOWER(title) LIKE #{keywordPattern} THEN 0
+    ELSE 1
+    END,
+    title ASC
+    LIMIT 50
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from Movie
     where movie_id = #{movieId,jdbcType=INTEGER}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Ratings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .movie-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+            height: 100%;
+            position: relative;
+        }
+        .movie-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card-img-container {
+            height: 300px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .broken-image {
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-weight: bold;
+            height: 100%;
+            flex-direction: column;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .debug-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            z-index: 10;
+        }
+        .image-error {
+            border: 2px dashed #dc3545;
+        }
+        .data-debug {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 5px;
+            font-size: 0.7rem;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">MovieRatings</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" th:href="@{/movies}">Movies</a>
+                </li>
+            </ul>
+            <form class="d-flex" th:action="@{/movies/search}" method="get">
+                <input class="form-control me-2" type="search" name="query" placeholder="Search movies...">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Movie Collection</h1>
+
+    <!-- Movie Grid -->
+    <div class="row" id="movies-container">
+        <div th:each="movie : ${movies}" class="col-md-4 col-lg-3 mb-4">
+            <div class="card movie-card">
+                <div class="debug-badge" th:text="${movieStat.index + 1}"></div>
+
+                <div class="card-img-container">
+                    <!-- Debug information (visible only during development) -->
+                    <div class="data-debug" th:if="${@environment.getProperty('spring.profiles.active') == 'dev'}">
+                        ID: <span th:text="${movie.movieId}"></span> |
+                        URL: <span th:text="${movie.posterUrl} ?: 'NULL'"></span>
+                    </div>
+
+                    <!-- Actual image display -->
+                    <div th:if="${movie.posterUrl != null and !movie.posterUrl.isEmpty()}">
+                        <img th:src="@{${movie.posterUrl}}"
+                             alt="${movie.title}"
+                             class="img-fluid movie-poster"
+                             onerror="this.onerror=null;this.src='/images/placeholder.jpg';">
+                    </div>
+
+                    <!-- Error display (shown when no posterUrl) -->
+                    <div th:unless="${movie.posterUrl != null and !movie.posterUrl.isEmpty()}"
+                         class="broken-image text-center">
+                        <i class="fas fa-bug fa-3x text-danger mb-2"></i>
+                        <div>IMAGE NOT AVAILABLE</div>
+                        <small class="text-muted">Poster URL missing</small>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${movie.title}"></h5>
+                    <p class="card-text">
+                        <small class="text-muted" th:text="${movie.genre} ?: 'Genre not specified'"></small><br>
+                        <span th:text="${movie.duration} ? ${movie.duration + ' min'} : 'Duration unknown'"></span>
+                    </p>
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{'/movies/' + ${movie.movieId}}" class="btn btn-primary btn-sm">Details</a>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-star"></i> Rate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/movies(page=1)}">First</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/movies(page=${currentPage - 1})}">Previous</a>
+            </li>
+            <li class="page-item active">
+                <a class="page-link" th:text="${currentPage}"></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" th:href="@{/movies(page=${currentPage + 1})}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Enhanced error handling
+    function handleImageError(img) {
+        console.error('Failed to load image:', img.dataset.filename);
+        const container = img.parentElement;
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'broken-image';
+        errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-2"></i>
+        <div>IMAGE NOT FOUND</div>
+        <small class="text-muted">${img.dataset.filename}</small>
+    `;
+
+        container.replaceChild(errorDiv, img);
+    }
+
+    // Debug logging
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('img[data-filename]').forEach(img => {
+            console.log('Attempting to load:', img.dataset.filename);
+        });
+    });
+</script>
+</body>
+</html>

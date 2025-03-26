@@ -33,4 +33,8 @@ public class MovieService {
     public int deleteMovie(int movieId) {
         return movieDao.deleteMovie(movieId);
     }
+
+    public List<Movie> searchMovies(String keyword) {
+        return movieDao.searchMovies("%" + keyword.toLowerCase() + "%");
+    }
 }
