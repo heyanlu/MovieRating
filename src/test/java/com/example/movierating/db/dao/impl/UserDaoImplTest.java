@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @SpringBootTest
 class UserDaoImplTest {
@@ -40,6 +42,18 @@ class UserDaoImplTest {
                 .build();
 
         userDao.insertUser(testUser);
+    }
+
+
+    @Test
+    void getUserByEmailTest() {
+        User foundUser = userDao.selectUserByEmail("test@example.com");
+
+        assertTrue(foundUser != null, "User with email test@example.com should exist");
+
+        assertTrue("test@example.com".equals(foundUser.getEmail()),
+                "Found user should have email test@example.com");
+
     }
 
 

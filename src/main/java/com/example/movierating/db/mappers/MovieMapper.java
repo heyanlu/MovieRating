@@ -1,6 +1,9 @@
 package com.example.movierating.db.mappers;
 
 import com.example.movierating.db.po.Movie;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface MovieMapper {
     int deleteByPrimaryKey(Integer movieId);
@@ -16,4 +19,7 @@ public interface MovieMapper {
     int updateByPrimaryKeyWithBLOBs(Movie record);
 
     int updateByPrimaryKey(Movie record);
+
+    List<Movie> selectMovies(Integer offset, Integer limit);
+
 }
