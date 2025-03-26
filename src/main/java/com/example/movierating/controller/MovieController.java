@@ -30,7 +30,8 @@ public class MovieController {
         model.addAttribute("movies", movies);
         model.addAttribute("currentPage", page);
         model.addAttribute("limit", limit);
-        return "movies"; // This corresponds to movies.html in templates folder
+        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
+        return "movies";
     }
 
     // Keep your API endpoints but change their path to /api/movies
