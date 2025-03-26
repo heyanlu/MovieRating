@@ -56,5 +56,54 @@
                 enableSelectByExample="false"
                 enableUpdateByExample="false">
         </table>
+        <table
+                schema="MoviePlatform"
+                tableName="UserFavorites"
+                domainObjectName="UserFavorites"
+                enableCountByExample="false"
+                enableDeleteByExample="false"
+                enableSelectByExample="false"
+                enableUpdateByExample="false">
+        </table>
+
+        <table
+                schema="MoviePlatform"
+                tableName="Collection"
+                domainObjectName="Collection"
+                enableCountByExample="false"
+                enableDeleteByExample="false"
+                enableSelectByExample="false"
+                enableUpdateByExample="false">
+        </table>
+
+        <table
+                schema="MoviePlatform"
+                tableName="MovieActor"
+                domainObjectName="MovieActor"
+                enableCountByExample="false"
+                enableDeleteByExample="false"
+                enableSelectByExample="false"
+                enableUpdateByExample="false">
+        </table>
+
+        <table
+                schema="MoviePlatform"
+                tableName="UserRelationship"
+                domainObjectName="UserRelationship"
+                enableCountByExample="false"
+                enableDeleteByExample="false"
+                enableSelectByExample="false"
+                enableUpdateByExample="false">
+        </table>
+
+        <table
+                schema="MoviePlatform"
+                tableName="Rating"
+                domainObjectName="Rating"
+                enableCountByExample="false"
+                enableDeleteByExample="false"
+                enableSelectByExample="false"
+                enableUpdateByExample="false">
+        </table>
     </context>
 </generatorConfiguration>

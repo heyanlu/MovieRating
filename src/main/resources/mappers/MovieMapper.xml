@@ -24,34 +24,34 @@
     description
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from Movie
     where movie_id = #{movieId,jdbcType=INTEGER}
   </select>
-    <select id="selectMovies" resultType="com.example.movierating.db.po.Movie">
-      select
-      <include refid="Base_Column_List" />
-      ,
-      <include refid="Blob_Column_List" />
-      from Movie
-      LIMIT #{limit} OFFSET #{offset}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <select id="selectMovies" resultType="com.example.movierating.db.po.Movie">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from Movie
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from Movie
     where movie_id = #{movieId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.example.movierating.db.po.Movie">
-    insert into Movie (movie_id, title, director, 
-      release_date, poster_url, genre, 
-      duration, country, create_date, 
-      update_date, description)
-    values (#{movieId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{director,jdbcType=VARCHAR}, 
-      #{releaseDate,jdbcType=DATE}, #{posterUrl,jdbcType=VARCHAR}, #{genre,jdbcType=VARCHAR}, 
-      #{duration,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{updateDate,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
+    insert into Movie (movie_id, title, director,
+                       release_date, poster_url, genre,
+                       duration, country, create_date,
+                       update_date, description)
+    values (#{movieId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{director,jdbcType=VARCHAR},
+            #{releaseDate,jdbcType=DATE}, #{posterUrl,jdbcType=VARCHAR}, #{genre,jdbcType=VARCHAR},
+            #{duration,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
+            #{updateDate,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.example.movierating.db.po.Movie">
     insert into Movie
@@ -165,28 +165,28 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.movierating.db.po.Movie">
     update Movie
     set title = #{title,jdbcType=VARCHAR},
-      director = #{director,jdbcType=VARCHAR},
-      release_date = #{releaseDate,jdbcType=DATE},
-      poster_url = #{posterUrl,jdbcType=VARCHAR},
-      genre = #{genre,jdbcType=VARCHAR},
-      duration = #{duration,jdbcType=INTEGER},
-      country = #{country,jdbcType=VARCHAR},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP},
-      description = #{description,jdbcType=LONGVARCHAR}
+        director = #{director,jdbcType=VARCHAR},
+        release_date = #{releaseDate,jdbcType=DATE},
+        poster_url = #{posterUrl,jdbcType=VARCHAR},
+        genre = #{genre,jdbcType=VARCHAR},
+        duration = #{duration,jdbcType=INTEGER},
+        country = #{country,jdbcType=VARCHAR},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+        description = #{description,jdbcType=LONGVARCHAR}
     where movie_id = #{movieId,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.example.movierating.db.po.Movie">
     update Movie
     set title = #{title,jdbcType=VARCHAR},
-      director = #{director,jdbcType=VARCHAR},
-      release_date = #{releaseDate,jdbcType=DATE},
-      poster_url = #{posterUrl,jdbcType=VARCHAR},
-      genre = #{genre,jdbcType=VARCHAR},
-      duration = #{duration,jdbcType=INTEGER},
-      country = #{country,jdbcType=VARCHAR},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP}
+        director = #{director,jdbcType=VARCHAR},
+        release_date = #{releaseDate,jdbcType=DATE},
+        poster_url = #{posterUrl,jdbcType=VARCHAR},
+        genre = #{genre,jdbcType=VARCHAR},
+        duration = #{duration,jdbcType=INTEGER},
+        country = #{country,jdbcType=VARCHAR},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
     where movie_id = #{movieId,jdbcType=INTEGER}
   </update>
 </mapper>

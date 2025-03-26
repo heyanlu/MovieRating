@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.movierating.db.mappers.MovieActorMapper">
+
+  <!-- Base Result Map -->
+  <resultMap id="BaseResultMap" type="com.example.movierating.db.po.MovieActorKey">
+    <id column="movie_id" jdbcType="INTEGER" property="movieId" />
+    <id column="actor_id" jdbcType="INTEGER" property="actorId" />
+  </resultMap>
+
+  <!-- CRUD Operations -->
+  <delete id="deleteByPrimaryKey" parameterType="com.example.movierating.db.po.MovieActorKey">
+    delete from MovieActor
+    where movie_id = #{movieId,jdbcType=INTEGER}
+      and actor_id = #{actorId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.example.movierating.db.po.MovieActorKey">
+    insert into MovieActor (movie_id, actor_id)
+    values (#{movieId,jdbcType=INTEGER}, #{actorId,jdbcType=INTEGER})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.example.movierating.db.po.MovieActorKey">
+    insert into MovieActor
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="movieId != null">
+        movie_id,
+      </if>
+      <if test="actorId != null">
+        actor_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="movieId != null">
+        #{movieId,jdbcType=INTEGER},
+      </if>
+      <if test="actorId != null">
+        #{actorId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+</mapper>

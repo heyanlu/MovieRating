@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.movierating.db.mappers.CollectionMapper">
+
+  <!-- Base Definitions -->
+  <resultMap id="BaseResultMap" type="com.example.movierating.db.po.Collection">
+    <id column="collection_id" jdbcType="INTEGER" property="collectionId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="movie_id" jdbcType="INTEGER" property="movieId" />
+    <result column="collection_type" jdbcType="CHAR" property="collectionType" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    collection_id, user_id, movie_id, collection_type, create_date, update_date
+  </sql>
+
+  <!-- CRUD Operations -->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from Collection
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from Collection
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.example.movierating.db.po.Collection">
+    insert into Collection (collection_id, user_id, movie_id,
+                            collection_type, create_date, update_date)
+    values (#{collectionId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{movieId,jdbcType=INTEGER},
+            #{collectionType,jdbcType=CHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.example.movierating.db.po.Collection">
+    insert into Collection
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="collectionId != null">
+        collection_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="movieId != null">
+        movie_id,
+      </if>
+      <if test="collectionType != null">
+        collection_type,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="collectionId != null">
+        #{collectionId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="movieId != null">
+        #{movieId,jdbcType=INTEGER},
+      </if>
+      <if test="collectionType != null">
+        #{collectionType,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.movierating.db.po.Collection">
+    update Collection
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="movieId != null">
+        movie_id = #{movieId,jdbcType=INTEGER},
+      </if>
+      <if test="collectionType != null">
+        collection_type = #{collectionType,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.example.movierating.db.po.Collection">
+    update Collection
+    set user_id = #{userId,jdbcType=INTEGER},
+        movie_id = #{movieId,jdbcType=INTEGER},
+        collection_type = #{collectionType,jdbcType=CHAR},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </update>
+
+</mapper>
