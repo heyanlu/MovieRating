@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -87,4 +88,15 @@ public class UserController {
         private Integer followerId;
     }
 
+    @GetMapping("/{userId}/followers")
+    public ResponseEntity<List<User>> getFollowers(@PathVariable Integer userId) {
+        try {
+            List<User> followers = relationshipService.getFollowerIds(userId);
+            return ResponseEntity.ok(followers);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

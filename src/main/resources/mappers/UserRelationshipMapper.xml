@@ -30,6 +30,18 @@
     WHERE follower_id = #{followerId,jdbcType=INTEGER}
       AND followed_id = #{followedId,jdbcType=INTEGER}
   </select>
+<!--  <select id="selectFollowersByUserId" resultMap="com.example.movierating.db.mappers.UserMapper.BaseResultMap">-->
+<!--    SELECT u.*-->
+<!--    FROM UserRelationship r-->
+<!--           JOIN User u ON r.follower_id = u.user_id-->
+<!--    WHERE r.followed_id = #{userId,jdbcType=INTEGER}-->
+<!--  </select>-->
+  <select id="selectFollowerIdsByUserId" resultType="com.example.movierating.db.po.User">
+    SELECT u.*
+    FROM UserRelationship r
+           JOIN User u ON r.follower_id = u.user_id
+    WHERE r.followed_id = #{userId,jdbcType=INTEGER}
+  </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from UserRelationship

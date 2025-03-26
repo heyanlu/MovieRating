@@ -1,6 +1,9 @@
 package com.example.movierating.db.mappers;
 
+import com.example.movierating.db.po.User;
 import com.example.movierating.db.po.UserRelationship;
+
+import java.util.List;
 
 public interface UserRelationshipMapper {
     int deleteByPrimaryKey(Integer relationshipId);
@@ -18,4 +21,7 @@ public interface UserRelationshipMapper {
     int insertRelationship(UserRelationship relationship);
 
     boolean relationshipExists(Integer followerId, Integer followedId);
+
+    List<User> selectFollowerIdsByUserId(Integer userId);
+
 }
