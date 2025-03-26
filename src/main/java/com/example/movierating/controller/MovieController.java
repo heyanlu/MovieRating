@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,8 @@ public class MovieController {
     @Resource
     private MovieService movieService;
 
-    // This will serve the HTML page with Thymeleaf
+    /* ============== Thymeleaf View Endpoints ============== */
+
     @GetMapping("/view")
     public String getMoviesView(
             @RequestParam(defaultValue = "1") int page,
@@ -30,11 +30,42 @@ public class MovieController {
         model.addAttribute("movies", movies);
         model.addAttribute("currentPage", page);
         model.addAttribute("limit", limit);
+        model.addAttribute("isSearch", false);
         movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
+
         return "movies";
     }
 
-    // Keep your API endpoints but change their path to /api/movies
+    @GetMapping("/search")
+    public String searchMoviesView(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "12") int limit,
+            Model model) {
+        List<Movie> movies = movieService.searchMovies(query, page, limit);
+        model.addAttribute("movies", movies);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("limit", limit);
+        model.addAttribute("searchQuery", query);
+        model.addAttribute("isSearch", true);
+        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
+
+        return "movies";
+    }
+
+    @GetMapping("/details/{movieId}")
+    public String getMovieDetailsView(
+            @PathVariable Integer movieId,
+            Model model) {
+        Movie movie = movieService.getMovieById(movieId);
+        model.addAttribute("movie", movie);
+        return "movie-details";
+    }
+
+
+
+    /* ============== Existing API Endpoints has not connect with frontend  ============== */
+
     @GetMapping("/api/list")
     @ResponseBody
     public ResponseEntity<List<Movie>> getAllMovies(
@@ -55,6 +86,7 @@ public class MovieController {
     }
 
     @PostMapping("/api/addMovie")
+    @ResponseBody
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         int result = movieService.addMovie(movie);
         if (result > 0) {
@@ -64,6 +96,7 @@ public class MovieController {
     }
 
     @PutMapping("/api/{movieId}")
+    @ResponseBody
     public ResponseEntity<Movie> updateMovie(
             @PathVariable Integer movieId,
             @RequestBody Movie movie) {
@@ -76,6 +109,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/api/{movieId}")
+    @ResponseBody
     public ResponseEntity<Void> deleteMovie(@PathVariable Integer movieId) {
         int result = movieService.deleteMovie(movieId);
         if (result > 0) {
@@ -84,14 +118,4 @@ public class MovieController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/api/search")
-    public ResponseEntity<List<Movie>> searchMovies(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "10") int limit) {
-        List<Movie> movies = movieService.searchMovies(query);
-        if (movies.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(movies.stream().limit(limit).collect(Collectors.toList()));
-    }
 }

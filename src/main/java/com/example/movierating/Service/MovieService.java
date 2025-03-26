@@ -5,6 +5,8 @@ import com.example.movierating.db.po.Movie;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -34,7 +36,14 @@ public class MovieService {
         return movieDao.deleteMovie(movieId);
     }
 
-    public List<Movie> searchMovies(String keyword) {
-        return movieDao.searchMovies("%" + keyword.toLowerCase() + "%");
+    public List<Movie> searchMovies(String keyword, int page, int limit) {
+        List<Movie> allResults = movieDao.searchMovies("%" + keyword.toLowerCase() + "%");
+        // Manual pagination implementation
+        int start = (page - 1) * limit;
+        if (start >= allResults.size()) {
+            return Collections.emptyList();
+        }
+        int end = Math.min(start + limit, allResults.size());
+        return allResults.subList(start, end);
     }
 }

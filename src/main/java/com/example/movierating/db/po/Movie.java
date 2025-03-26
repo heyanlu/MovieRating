@@ -3,6 +3,7 @@ package com.example.movierating.db.po;
 import java.util.Date;
 
 public class Movie {
+
     private Integer movieId;
 
     private String title;
