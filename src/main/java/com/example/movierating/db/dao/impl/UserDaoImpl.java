@@ -7,6 +7,8 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -32,5 +34,11 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User selectUserById(int id) {
         return userMapper.selectByUserId(id);
+    }
+
+    @Override
+    public List<User> findUsersNotFollowed(int id) {
+        return userMapper.findUsersNotFollowed(id);
+
     }
 }

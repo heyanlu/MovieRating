@@ -24,7 +24,7 @@ public interface UserRelationshipMapper {
 
     List<User> selectFollowerIdsByUserId(Integer userId);
 
-    List<User> findByFollowerId(Integer followerId);
+    List<User> findByFollowing(Integer followerId);
 
 
 }

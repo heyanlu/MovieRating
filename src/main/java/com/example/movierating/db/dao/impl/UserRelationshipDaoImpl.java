@@ -19,7 +19,7 @@ public class UserRelationshipDaoImpl implements UserRelationshipDao {
 
     @Override
     public List<User> findByFollowerId(Integer followerId) {
-        return userRelationshipMapper.findByFollowerId(followerId);
+        return userRelationshipMapper.findByFollowing(followerId);
     }
 
     @Override

@@ -101,5 +101,17 @@
     FROM User
     WHERE user_id = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="findUsersNotFollowed" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM User  <!-- Consistent capitalization -->
+    WHERE user_id != #{currentUserId,jdbcType=INTEGER}
+    AND user_id NOT IN (
+    SELECT followed_id
+    FROM UserRelationship
+    WHERE follower_id = #{currentUserId,jdbcType=INTEGER}
+    )
+    LIMIT 5
+  </select>
 
 </mapper>
