@@ -52,7 +52,11 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String showRegisterForm() {
+    public String showRegisterForm(Model model) {
+        model.addAttribute("username", "");
+        model.addAttribute("email", "");
+        model.addAttribute("profileUrl", "");
+        model.addAttribute("bio", "");
         return "register";
     }
 
@@ -63,6 +67,7 @@ public class UserController {
             @RequestParam String password,
             @RequestParam(required = false) String profileUrl,
             @RequestParam(required = false) String bio,
+            HttpSession session,  // Add HttpSession parameter
             Model model) {
 
         try {
@@ -71,7 +76,12 @@ public class UserController {
                 model.addAttribute("error", "Username or email already exists");
                 return "register";
             }
-            return "redirect:/users/login"; // redirect to login after registration
+
+            session.setAttribute("userEmail", user.getEmail());
+            session.setAttribute("username", user.getUsername());
+
+            return "redirect:/movies";
+
         } catch (Exception e) {
             model.addAttribute("error", "Registration failed");
             return "register";
