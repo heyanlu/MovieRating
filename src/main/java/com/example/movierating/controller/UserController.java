@@ -78,6 +78,23 @@ public class UserController {
         }
     }
 
+    @GetMapping("/profile")
+    public String showProfile(HttpSession session, Model model) {
+        String userEmail = (String) session.getAttribute("userEmail");
+        if (userEmail == null) {
+            return "redirect:/login";
+        }
+
+        User user = userService.getUserByEmail(userEmail);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", user);
+        return "profile";
+    }
+
+
     @PostMapping("/token-login")
     public ResponseEntity<?> tokenLogin(
             @RequestParam String usernameOrEmail,

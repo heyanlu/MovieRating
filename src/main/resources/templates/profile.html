@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.username} + ' | Profile'">User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Navbar Styles */
+        .navbar-custom {
+            background-color: #343a40;
+            padding: 0.75rem 1rem;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        .search-box {
+            width: 300px;
+        }
+
+        /* Profile Styles */
+        .profile-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        .profile-header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 1rem;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<!-- NAVBAR START -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">MovieRatings</a>
+
+        <div class="d-flex">
+            <!-- Search Form -->
+            <form class="d-flex me-3" th:action="@{/movies/search}" method="get">
+                <input type="hidden" name="page" value="1">
+                <div class="input-group search-box">
+                    <input class="form-control"
+                           type="search"
+                           name="query"
+                           th:value="${searchQuery ?: ''}"
+                           placeholder="Search movies...">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Auth Section -->
+            <ul class="navbar-nav">
+                <li class="nav-item" th:if="${session.userEmail != null}">
+                    <div class="d-flex align-items-center">
+                            <span class="text-light me-2">
+                                Hello, <span th:text="${session.username}"></span>!
+                            </span>
+                        <a th:href="@{/profile}" class="btn btn-link text-light me-2" title="Profile">
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </a>
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button class="btn btn-outline-light" type="submit" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </li>
+                <li class="nav-item" th:unless="${session.userEmail != null}">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item" th:unless="${session.userEmail != null}">
+                    <a class="nav-link" th:href="@{/register}">Register</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- NAVBAR END -->
+
+<!-- PROFILE CONTENT -->
+<div class="container">
+    <div class="profile-card mx-auto">
+        <div class="profile-header">
+            <img th:src="${user.profileUrl ?: '/images/default-profile.png'}"
+                 class="profile-pic"
+                 alt="Profile Picture">
+            <h2 th:text="${user.username}">Username</h2>
+            <p class="mb-0" th:text="${user.bio ?: 'No bio yet'}"></p>
+        </div>
+
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-info-circle me-2"></i>Basic Info</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4 info-label">Email</dt>
+                        <dd class="col-sm-8" th:text="${user.email}">user@example.com</dd>
+
+<!--                        <dt class="col-sm-4 info-label">Member Since</dt>-->
+<!--                        <dd class="col-sm-8" th:text="${#dates.format(new java.util.Date(user.createDate.time), 'MMMM d, yyyy')}">                            January 1, 2023-->
+<!--                        </dd>-->
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h4><i class="fas fa-star me-2"></i>Stats</h4>
+                    <dl class="row">
+<!--                        <dt class="col-sm-4 info-label">Movies Rated</dt>-->
+<!--                        <dd class="col-sm-8" th:text="${user.ratings != null ? user.ratings.size() : '0'}">0</dd>-->
+
+<!--                        <dt class="col-sm-4 info-label">Last Active</dt>-->
+<!--                        <dd class="col-sm-8" th:text="${#temporals.format(user.updateDate, 'MMMM d, yyyy')}">-->
+<!--                            January 1, 2023-->
+<!--                        </dd>-->
+                    </dl>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a th:href="@{/profile/edit}" class="btn btn-primary">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+                <a th:href="@{/change-password}" class="btn btn-outline-secondary">
+                    <i class="fas fa-key me-2"></i>Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="mt-5">
+        <h4 class="mb-4"><i class="fas fa-history me-2"></i>Recent Activity</h4>
+
+<!--        <div th:if="${user.ratings != null and !user.ratings.isEmpty()}">-->
+<!--            <div class="list-group">-->
+<!--                <a th:each="rating : ${user.ratings}"-->
+<!--                   th:href="@{'/movies/' + ${rating.movie.id}}"-->
+<!--                   class="list-group-item list-group-item-action">-->
+<!--                    <div class="d-flex w-100 justify-content-between">-->
+<!--                        <h6 class="mb-1" th:text="${rating.movie.title}">Movie Title</h6>-->
+<!--                        <span class="badge bg-primary rounded-pill"-->
+<!--                              th:text="${rating.rating} + '/10'">5/10</span>-->
+<!--                    </div>-->
+<!--&lt;!&ndash;                    <small class="text-muted"&ndash;&gt;-->
+<!--&lt;!&ndash;                           th:text="${'Rated on ' + #temporals.format(rating.ratedDate, 'MMM d, yyyy')}">&ndash;&gt;-->
+<!--&lt;!&ndash;                        Rated on Jan 1&ndash;&gt;-->
+<!--&lt;!&ndash;                    </small>&ndash;&gt;-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

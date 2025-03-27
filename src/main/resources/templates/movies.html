@@ -140,14 +140,22 @@
 <!--                <li class="nav-item"><a class="nav-link" th:href="@{/register}">Register</a></li>-->
 <!--            </ul>-->
             <ul class="navbar-nav ms-auto">
-                <!-- Changed from session.user to session.username -->
                 <li class="nav-item" th:if="${session.username != null}">
                     <div class="d-flex align-items-center">
             <span class="text-light me-2">
                 Hello, <span th:text="${session.username}"></span>!
             </span>
-                        <form th:action="@{/logout}" method="post">
-                            <button class="btn btn-outline-light" type="submit">Logout</button>
+
+                        <!-- Profile Link -->
+                        <a th:href="@{/profile}" class="btn btn-link text-light me-2" title="Profile">
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </a>
+
+                        <!-- Logout Form -->
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button class="btn btn-outline-light" type="submit" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
                         </form>
                     </div>
                 </li>
