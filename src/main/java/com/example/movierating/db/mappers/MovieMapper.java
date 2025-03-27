@@ -12,7 +12,7 @@ public interface MovieMapper {
 
     int insertSelective(Movie record);
 
-    Movie selectByPrimaryKey(Integer movieId);
+    Movie selectByPrimaryKey(Integer movieTitle);
 
     int updateByPrimaryKeySelective(Movie record);
 

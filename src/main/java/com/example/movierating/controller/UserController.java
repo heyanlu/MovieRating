@@ -5,16 +5,19 @@ import com.example.movierating.Service.UserService;
 import com.example.movierating.db.po.User;
 import com.example.movierating.db.po.UserRelationship;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+
 
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
 public class UserController {
 
     @Resource
@@ -23,36 +26,56 @@ public class UserController {
     @Resource
     private RelationshipService relationshipService;
 
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String handleLogin(
+            @RequestParam String email,
+            @RequestParam String password,
+            HttpSession session,
+            Model model) {
+
+        User user = userService.login(email, password);
+        if (user == null) {
+            model.addAttribute("error", "Invalid credentials");
+            return "login";
+        }
+
+        session.setAttribute("user", user);
+        session.setAttribute("userEmail", user.getEmail());
+        session.setAttribute("username", user.getUsername());
+
+        return "redirect:/movies";
+    }
+
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register";
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(
+    public String register(
             @RequestParam String username,
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam(required = false) String profileUrl,
-            @RequestParam(required = false) String bio) {
+            @RequestParam(required = false) String bio,
+            Model model) {
 
         try {
             User user = userService.createUser(username, email, password, profileUrl, bio);
             if (user == null) {
-                return ResponseEntity.badRequest().body("Username or email already exists");
+                model.addAttribute("error", "Username or email already exists");
+                return "register";
             }
-            return ResponseEntity.ok("User registered successfully");
+            return "redirect:/users/login"; // redirect to login after registration
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Registration failed");
+            model.addAttribute("error", "Registration failed");
+            return "register";
         }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestParam String usernameOrEmail,
-            @RequestParam String password) {
-
-        User user = userService.login(usernameOrEmail, password);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid credentials"));
-        }
-        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/token-login")

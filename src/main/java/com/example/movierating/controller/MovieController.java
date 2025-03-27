@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/movies")
 public class MovieController {
 
     @Resource
@@ -21,7 +19,7 @@ public class MovieController {
 
     /* ============== Thymeleaf View Endpoints ============== */
 
-    @GetMapping("/view")
+    @GetMapping("/movies")
     public String getMoviesView(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int limit,
@@ -36,7 +34,7 @@ public class MovieController {
         return "movies";
     }
 
-    @GetMapping("/search")
+    @GetMapping("/movies/search")
     public String searchMoviesView(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page,
@@ -53,39 +51,23 @@ public class MovieController {
         return "movies";
     }
 
-    @GetMapping("/details/{movieId}")
-    public String getMovieDetailsView(
-            @PathVariable Integer movieId,
-            Model model) {
+
+
+    @GetMapping("/movies/{movieId}")
+    public String getMovieDetails(@PathVariable Integer movieId, Model model) {
         Movie movie = movieService.getMovieById(movieId);
+        if (movie == null) {
+            return "error";
+        }
         model.addAttribute("movie", movie);
-        return "movie-details";
+        return "movie-detail";
     }
 
 
 
     /* ============== Existing API Endpoints has not connect with frontend  ============== */
 
-    @GetMapping("/api/list")
-    @ResponseBody
-    public ResponseEntity<List<Movie>> getAllMovies(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "12") int limit) {
-        List<Movie> movies = movieService.getMovies(page, limit);
-        return ResponseEntity.ok(movies);
-    }
-
-    @GetMapping("/api/{movieId}")
-    @ResponseBody
-    public ResponseEntity<Movie> getMovieById(@PathVariable Integer movieId) {
-        Movie movie = movieService.getMovieById(movieId);
-        if (movie == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(movie);
-    }
-
-    @PostMapping("/api/addMovie")
+    @PostMapping("/movies/addMovie")
     @ResponseBody
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         int result = movieService.addMovie(movie);
@@ -95,7 +77,7 @@ public class MovieController {
         return ResponseEntity.internalServerError().build();
     }
 
-    @PutMapping("/api/{movieId}")
+    @PutMapping("/movies/{movieId}")
     @ResponseBody
     public ResponseEntity<Movie> updateMovie(
             @PathVariable Integer movieId,
@@ -108,7 +90,7 @@ public class MovieController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/api/{movieId}")
+    @DeleteMapping("/movies/{movieId}")
     @ResponseBody
     public ResponseEntity<Void> deleteMovie(@PathVariable Integer movieId) {
         int result = movieService.deleteMovie(movieId);

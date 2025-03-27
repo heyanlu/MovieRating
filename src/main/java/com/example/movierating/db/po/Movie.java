@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class Movie {
 
+
     private Integer movieId;
 
     private String title;
