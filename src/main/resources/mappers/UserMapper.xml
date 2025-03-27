@@ -76,7 +76,7 @@
     WHERE user_id = #{userId,jdbcType=INTEGER}
   </update>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     DELETE FROM User
     WHERE user_id = #{userId,jdbcType=INTEGER}
   </delete>
@@ -94,6 +94,12 @@
     <include refid="Base_Column_List" />
     FROM User
     WHERE email = #{email,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByUserId" resultType="com.example.movierating.db.po.User">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM User
+    WHERE user_id = #{id,jdbcType=VARCHAR}
   </select>
 
 </mapper>

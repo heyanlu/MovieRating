@@ -15,7 +15,6 @@ public class UserService {
     @Resource
     private UserDao userDao;
 
-    // Create user with password hashing
     public User createUser(String username, String email, String password, String profileUrl, String bio) {
         // Check if user already exists
         if (userDao.selectUserByEmail(email) != null || userDao.selectUserByUsername(username) != null) {
@@ -91,4 +90,10 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userDao.selectUserByEmail(email);
     }
+
+    public User getUserByUserId(Integer userId) {
+        return userDao.selectUserById(userId);
+    }
+
+
 }

@@ -44,6 +44,43 @@
             font-weight: 600;
             color: #6c757d;
         }
+
+        /* New Relationships Styles */
+        .relationship-card {
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .relationship-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: inherit;
+        }
+        .user-list-item:last-child {
+            border-bottom: none;
+        }
+        .user-list-item:hover {
+            background-color: #f8f9fa;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+        .empty-message {
+            color: #6c757d;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -115,23 +152,64 @@
                     <dl class="row">
                         <dt class="col-sm-4 info-label">Email</dt>
                         <dd class="col-sm-8" th:text="${user.email}">user@example.com</dd>
-
-<!--                        <dt class="col-sm-4 info-label">Member Since</dt>-->
-<!--                        <dd class="col-sm-8" th:text="${#dates.format(new java.util.Date(user.createDate.time), 'MMMM d, yyyy')}">                            January 1, 2023-->
-<!--                        </dd>-->
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <h4><i class="fas fa-star me-2"></i>Stats</h4>
                     <dl class="row">
-<!--                        <dt class="col-sm-4 info-label">Movies Rated</dt>-->
-<!--                        <dd class="col-sm-8" th:text="${user.ratings != null ? user.ratings.size() : '0'}">0</dd>-->
-
-<!--                        <dt class="col-sm-4 info-label">Last Active</dt>-->
-<!--                        <dd class="col-sm-8" th:text="${#temporals.format(user.updateDate, 'MMMM d, yyyy')}">-->
-<!--                            January 1, 2023-->
-<!--                        </dd>-->
+                        <!-- Stats content here -->
                     </dl>
+                </div>
+            </div>
+
+            <!-- Relationships Section - Added Here -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="relationship-card card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-users me-2"></i>Followers
+                                <span class="badge bg-primary ms-1" th:text="${followerCount}">0</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div th:if="${not #lists.isEmpty(followers)}">
+                                <a th:each="follower : ${followers}"
+                                   th:href="@{'/profile/' + ${follower.userId}}"
+                                   class="user-list-item">
+                                    <img th:src="${follower.profileUrl ?: '/images/default-profile.png'}"
+                                         class="user-avatar">
+                                    <span th:text="${follower.username}">Follower Name</span>
+                                </a>
+                            </div>
+                            <div th:if="${#lists.isEmpty(followers)}" class="p-3 text-center empty-message">
+                                No followers yet
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="relationship-card card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user-friends me-2"></i>Following
+                                <span class="badge bg-primary ms-1" th:text="${followingCount}">0</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div th:if="${not #lists.isEmpty(following)}">
+                                <a th:each="followed : ${following}"
+                                   th:href="@{'/profile/' + ${followed.userId}}"
+                                   class="user-list-item">
+                                    <img th:src="${followed.profileUrl ?: '/images/default-profile.png'}"
+                                         class="user-avatar">
+                                    <span th:text="${followed.username}">Following Name</span>
+                                </a>
+                            </div>
+                            <div th:if="${#lists.isEmpty(following)}" class="p-3 text-center empty-message">
+                                Not following anyone yet
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -149,26 +227,7 @@
     <!-- Recent Activity Section -->
     <div class="mt-5">
         <h4 class="mb-4"><i class="fas fa-history me-2"></i>Recent Activity</h4>
-
-<!--        <div th:if="${user.ratings != null and !user.ratings.isEmpty()}">-->
-<!--            <div class="list-group">-->
-<!--                <a th:each="rating : ${user.ratings}"-->
-<!--                   th:href="@{'/movies/' + ${rating.movie.id}}"-->
-<!--                   class="list-group-item list-group-item-action">-->
-<!--                    <div class="d-flex w-100 justify-content-between">-->
-<!--                        <h6 class="mb-1" th:text="${rating.movie.title}">Movie Title</h6>-->
-<!--                        <span class="badge bg-primary rounded-pill"-->
-<!--                              th:text="${rating.rating} + '/10'">5/10</span>-->
-<!--                    </div>-->
-<!--&lt;!&ndash;                    <small class="text-muted"&ndash;&gt;-->
-<!--&lt;!&ndash;                           th:text="${'Rated on ' + #temporals.format(rating.ratedDate, 'MMM d, yyyy')}">&ndash;&gt;-->
-<!--&lt;!&ndash;                        Rated on Jan 1&ndash;&gt;-->
-<!--&lt;!&ndash;                    </small>&ndash;&gt;-->
-<!--                </a>-->
-<!--            </div>-->
-<!--        </div>-->
-
-
+        <!-- Activity content here -->
     </div>
 </div>
 

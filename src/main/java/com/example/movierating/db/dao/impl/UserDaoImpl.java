@@ -28,4 +28,9 @@ public class UserDaoImpl implements UserDao {
     public User selectUserByEmail(String email) {
         return userMapper.selectByEmail(email);
     }
+
+    @Override
+    public User selectUserById(int id) {
+        return userMapper.selectByUserId(id);
+    }
 }

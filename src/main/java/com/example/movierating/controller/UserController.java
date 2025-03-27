@@ -26,6 +26,7 @@ public class UserController {
     @Resource
     private RelationshipService relationshipService;
 
+
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
@@ -45,6 +46,7 @@ public class UserController {
         }
 
         session.setAttribute("user", user);
+        session.setAttribute("userId", user.getUserId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("username", user.getUsername());
 
@@ -91,34 +93,32 @@ public class UserController {
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         String userEmail = (String) session.getAttribute("userEmail");
+        Integer userId = (Integer) session.getAttribute("userId");
+
         if (userEmail == null) {
             return "redirect:/login";
         }
 
         User user = userService.getUserByEmail(userEmail);
+
         if (user == null) {
             return "redirect:/login";
         }
 
+        List<User> followers = relationshipService.getFollowerIds(userId);
+        List<User> following = relationshipService.getFollowers(userId);
+
         model.addAttribute("user", user);
+        model.addAttribute("followers", followers);
+        model.addAttribute("following", following);
+        model.addAttribute("followerCount", followers.size());
+        model.addAttribute("followingCount", following.size());
+
         return "profile";
     }
 
 
-    @PostMapping("/token-login")
-    public ResponseEntity<?> tokenLogin(
-            @RequestParam String usernameOrEmail,
-            @RequestParam String password) {
-
-        Map<String, Object> authResult = userService.loginWithToken(usernameOrEmail, password);
-        if (authResult == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid credentials"));
-        }
-        return ResponseEntity.ok(authResult);
-    }
-
-    @PostMapping("/{userId}/follow")
+    @PostMapping("/profile/follow")
     public ResponseEntity<UserRelationship> followUser(
             @PathVariable Integer userId,
             @RequestBody FollowRequest request) {
@@ -138,7 +138,7 @@ public class UserController {
         private Integer followerId;
     }
 
-    @GetMapping("/{userId}/followers")
+    @GetMapping("/profile/followers")
     public ResponseEntity<List<User>> getFollowers(@PathVariable Integer userId) {
         try {
             List<User> followers = relationshipService.getFollowerIds(userId);
