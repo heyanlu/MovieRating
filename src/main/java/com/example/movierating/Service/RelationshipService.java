@@ -38,11 +38,16 @@ public class RelationshipService {
         }
 
 
-        UserRelationship relationship = UserRelationship.builder()
+        /*UserRelationship relationship = UserRelationship.builder()
                 .followerId(followerId)
                 .followedId(followedId)
                 .isactive(false)
-                .build();
+                .build(); */
+
+        UserRelationship relationship = new UserRelationship();
+        relationship.setFollowerId(followerId);
+        relationship.setFollowedId(followedId);
+        relationship.setIsactive(false);
 
         int rowsAffected = userRelationshipMapper.updateByPrimaryKeySelective(relationship);
 

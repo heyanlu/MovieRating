@@ -33,51 +33,110 @@
                 <ul class="list-unstyled">
                     <li><strong>Director:</strong> <span th:text="${movie.director}"></span></li>
                     <li><strong>Release Year:</strong> <span th:text="${movie.releaseYear}"></span></li>
-                    <li><strong>Rating:</strong> <span th:text="${movie.rating}"></span>/10</li>
+                    <li><strong>Rating:</strong> <span id="avgRating">-</span>/10</li>
                 </ul>
             </div>
             <div class="mt-3">
                 <button th:if="${!inCollection}" class="btn btn-primary"
-                        onclick="addToCollection(${movie.movieId})">
+                        onclick="addToCollection([[${movie.movieId}]])">
                     <i class="fas fa-bookmark me-1"></i> Add to My Collection
                 </button>
 
                 <button th:if="${inCollection}" class="btn btn-outline-primary"
-                        onclick="removeFromCollection(${movie.movieId})">
+                        onclick="removeFromCollection([[${movie.movieId}]])">
                     <i class="fas fa-bookmark me-1"></i> In Collection (Click to Remove)
                 </button>
             </div>
         </div>
     </div>
+
+    <!-- Rating Section -->
+    <hr class="my-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Submit Your Rating</h4>
+            <form onsubmit="submitRating(event)">
+                <div class="mb-2">
+                    <label>User ID</label>
+                    <input type="number" id="userId" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label>Score (1–10)</label>
+                    <input type="number" id="score" class="form-control" min="1" max="10" required>
+                </div>
+                <div class="mb-2">
+                    <label>Comment</label>
+                    <textarea id="comment" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success mt-2">Submit Rating</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h4>User Ratings</h4>
+            <div id="ratingList" class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+    </div>
 </div>
+
 <script>
+    const movieId = [[${movie.movieId}]];
+
     function addToCollection(movieId) {
-        fetch(`/api/collections/movies/${movieId}`, {
-            method: 'POST'
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Unable to add to collection');
-            }
-        })
+        fetch(`/api/collections/movies/${movieId}`, { method: 'POST' })
+        .then(response => response.ok ? location.reload() : alert('Unable to add to collection'))
         .catch(error => console.error('Error:', error));
     }
 
     function removeFromCollection(movieId) {
-        fetch(`/api/collections/movies/${movieId}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Unable to remove from collection');
-            }
-        })
+        fetch(`/api/collections/movies/${movieId}`, { method: 'DELETE' })
+        .then(response => response.ok ? location.reload() : alert('Unable to remove from collection'))
         .catch(error => console.error('Error:', error));
     }
+
+    function submitRating(event) {
+        event.preventDefault();
+        const userId = document.getElementById('userId').value;
+        const score = document.getElementById('score').value;
+        const comment = document.getElementById('comment').value;
+
+        fetch('/api/ratings/rate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, movieId, score, comment })
+        })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => {
+            alert('Rating submitted!');
+            loadRatings();
+        })
+        .catch(() => alert('Failed to submit rating'));
+    }
+
+    function loadRatings() {
+        fetch(`/api/ratings/movie/${movieId}/avg`)
+        .then(res => res.ok ? res.json() : null)
+        .then(avg => {
+            document.getElementById('avgRating').innerText = avg ? avg.toFixed(1) : '-';
+        });
+
+        fetch(`/api/movies/${movieId}/ratings`)
+        .then(res => res.ok ? res.json() : [])
+        .then(ratings => {
+            const container = document.getElementById('ratingList');
+            container.innerHTML = '';
+            ratings.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'mb-2';
+                div.innerHTML = `<strong>User:</strong> ${r.username || 'Anonymous'}<br>
+                                     <strong>Score:</strong> ${r.score}<br>
+                                     <strong>Comment:</strong> ${r.comment}`;
+                container.appendChild(div);
+            });
+        });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', loadRatings);
 </script>
 </body>
 </html>

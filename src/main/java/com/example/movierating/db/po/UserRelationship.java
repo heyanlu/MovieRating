@@ -2,8 +2,12 @@ package com.example.movierating.db.po;
 
 import java.util.Date;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRelationship {
     private Integer relationshipId;
 
