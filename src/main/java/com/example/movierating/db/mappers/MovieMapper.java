@@ -1,8 +1,6 @@
 package com.example.movierating.db.mappers;
 
 import com.example.movierating.db.po.Movie;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 public interface MovieMapper {
@@ -20,7 +18,7 @@ public interface MovieMapper {
 
     int updateByPrimaryKey(Movie record);
 
-    List<Movie> selectMovies(Integer offset, Integer limit);
+    List<Movie> selectMovies(int offset, int limit);
 
     List<Movie> searchMovies(String keywordPattern);
 }

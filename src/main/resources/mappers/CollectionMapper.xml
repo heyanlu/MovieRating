@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.movierating.db.mappers.CollectionMapper">
-
-  <!-- Base Definitions -->
   <resultMap id="BaseResultMap" type="com.example.movierating.db.po.Collection">
     <id column="collection_id" jdbcType="INTEGER" property="collectionId" />
     <result column="user_id" jdbcType="INTEGER" property="userId" />
@@ -16,28 +14,17 @@
     collection_id, user_id, movie_id, collection_type, create_date, update_date
   </sql>
 
-  <!-- CRUD Operations -->
+  <!-- Select by Primary Key -->
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from Collection
+    from `Collection`
     where collection_id = #{collectionId,jdbcType=INTEGER}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from Collection
-    where collection_id = #{collectionId,jdbcType=INTEGER}
-  </delete>
-
-  <insert id="insert" parameterType="com.example.movierating.db.po.Collection">
-    insert into Collection (collection_id, user_id, movie_id,
-                            collection_type, create_date, update_date)
-    values (#{collectionId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{movieId,jdbcType=INTEGER},
-            #{collectionType,jdbcType=CHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP})
-  </insert>
-
+  <!-- Insert Selective -->
   <insert id="insertSelective" parameterType="com.example.movierating.db.po.Collection">
-    insert into Collection
+    insert into `Collection`
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="collectionId != null">
         collection_id,
@@ -80,8 +67,9 @@
     </trim>
   </insert>
 
+  <!-- Update by Primary Key Selective -->
   <update id="updateByPrimaryKeySelective" parameterType="com.example.movierating.db.po.Collection">
-    update Collection
+    update `Collection`
     <set>
       <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
@@ -102,14 +90,26 @@
     where collection_id = #{collectionId,jdbcType=INTEGER}
   </update>
 
-  <update id="updateByPrimaryKey" parameterType="com.example.movierating.db.po.Collection">
-    update Collection
-    set user_id = #{userId,jdbcType=INTEGER},
-        movie_id = #{movieId,jdbcType=INTEGER},
-        collection_type = #{collectionType,jdbcType=CHAR},
-        create_date = #{createDate,jdbcType=TIMESTAMP},
-        update_date = #{updateDate,jdbcType=TIMESTAMP}
-    where collection_id = #{collectionId,jdbcType=INTEGER}
-  </update>
+  <!-- Select by User ID -->
+  <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from `Collection`
+    where user_id = #{userId,jdbcType=INTEGER}
+    order by create_date desc
+  </select>
 
+  <!-- Select by User ID and Movie ID -->
+  <select id="selectByUserIdAndMovieId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from `Collection`
+    where user_id = #{userId,jdbcType=INTEGER} and movie_id = #{movieId,jdbcType=INTEGER}
+  </select>
+
+  <!-- Delete by User ID and Movie ID -->
+  <delete id="deleteByUserIdAndMovieId">
+    delete from `Collection`
+    where user_id = #{userId,jdbcType=INTEGER} and movie_id = #{movieId,jdbcType=INTEGER}
+  </delete>
 </mapper>

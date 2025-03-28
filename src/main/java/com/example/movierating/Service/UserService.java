@@ -8,8 +8,11 @@ import org.springframework.util.DigestUtils;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
+import lombok.Builder;
 @Service
+
+
+@Builder
 public class UserService {
 
     @Resource

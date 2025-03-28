@@ -11,7 +11,7 @@
                 driverClass="com.mysql.cj.jdbc.Driver"
                 connectionURL="jdbc:mysql://localhost:3306/MoviePlatform?serverTimezone=UTC"
                 userId="root"
-                password="rootroot">
+                password="yddbk123">
         </jdbcConnection>
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false" />
