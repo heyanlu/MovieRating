@@ -25,6 +25,16 @@
   </sql>
 
   <!-- CRUD Operations -->
+  <select id="getMovieAvgRating" parameterType="java.lang.Integer" resultType="java.lang.Double">
+    SELECT avg_rating FROM movie WHERE movie_id = #{movieId}
+  </select>
+  <select id="findByMovieId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT * FROM rating WHERE movie_id = #{movieId}
+  </select>
+  <select id="findByUserIdAndMovieId" parameterType="map" resultMap="BaseResultMap">
+    SELECT * FROM rating WHERE user_id = #{userId} AND movie_id = #{movieId} LIMIT 1
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
     select
     <include refid="Base_Column_List" />,
@@ -40,11 +50,11 @@
 
   <insert id="insert" parameterType="com.example.movierating.db.po.Rating">
     insert into Rating (rating_id, user_id, movie_id,
-                        score, create_date, update_date,
-                        comment)
+    score, create_date, update_date,
+    comment)
     values (#{ratingId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{movieId,jdbcType=INTEGER},
-            #{score,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
-            #{comment,jdbcType=LONGVARCHAR})
+    #{score,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+    #{comment,jdbcType=LONGVARCHAR})
   </insert>
 
   <insert id="insertSelective" parameterType="com.example.movierating.db.po.Rating">
@@ -125,21 +135,21 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.movierating.db.po.Rating">
     update Rating
     set user_id = #{userId,jdbcType=INTEGER},
-        movie_id = #{movieId,jdbcType=INTEGER},
-        score = #{score,jdbcType=DECIMAL},
-        create_date = #{createDate,jdbcType=TIMESTAMP},
-        update_date = #{updateDate,jdbcType=TIMESTAMP},
-        comment = #{comment,jdbcType=LONGVARCHAR}
+    movie_id = #{movieId,jdbcType=INTEGER},
+    score = #{score,jdbcType=DECIMAL},
+    create_date = #{createDate,jdbcType=TIMESTAMP},
+    update_date = #{updateDate,jdbcType=TIMESTAMP},
+    comment = #{comment,jdbcType=LONGVARCHAR}
     where rating_id = #{ratingId,jdbcType=INTEGER}
   </update>
 
   <update id="updateByPrimaryKey" parameterType="com.example.movierating.db.po.Rating">
     update Rating
     set user_id = #{userId,jdbcType=INTEGER},
-        movie_id = #{movieId,jdbcType=INTEGER},
-        score = #{score,jdbcType=DECIMAL},
-        create_date = #{createDate,jdbcType=TIMESTAMP},
-        update_date = #{updateDate,jdbcType=TIMESTAMP}
+    movie_id = #{movieId,jdbcType=INTEGER},
+    score = #{score,jdbcType=DECIMAL},
+    create_date = #{createDate,jdbcType=TIMESTAMP},
+    update_date = #{updateDate,jdbcType=TIMESTAMP}
     where rating_id = #{ratingId,jdbcType=INTEGER}
   </update>
 

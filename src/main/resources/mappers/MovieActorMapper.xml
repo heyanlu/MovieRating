@@ -12,7 +12,7 @@
   <delete id="deleteByPrimaryKey" parameterType="com.example.movierating.db.po.MovieActorKey">
     delete from MovieActor
     where movie_id = #{movieId,jdbcType=INTEGER}
-      and actor_id = #{actorId,jdbcType=INTEGER}
+    and actor_id = #{actorId,jdbcType=INTEGER}
   </delete>
 
   <insert id="insert" parameterType="com.example.movierating.db.po.MovieActorKey">

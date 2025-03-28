@@ -106,31 +106,22 @@ public class UserController {
         }
 
         List<User> followers = relationshipService.getFollowerIds(userId);
-        List<User> following = relationshipService.getFollowers(userId);
+        List<User> following = relationshipService.getFollowing(userId);
+        List<User> suggestedUsers = userService.getSuggestedUsers(userId);
+
 
         model.addAttribute("user", user);
         model.addAttribute("followers", followers);
         model.addAttribute("following", following);
         model.addAttribute("followerCount", followers.size());
         model.addAttribute("followingCount", following.size());
+        model.addAttribute("suggestedUsers", suggestedUsers);
+
+
+        System.out.println("Suggested Users: " + suggestedUsers);
+
 
         return "profile";
-    }
-
-
-    @PostMapping("/profile/follow")
-    public ResponseEntity<UserRelationship> followUser(
-            @PathVariable Integer userId,
-            @RequestBody FollowRequest request) {
-
-        try {
-            UserRelationship relationship = relationshipService.followUser(
-                    request.getFollowerId(),
-                    userId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(relationship);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
     }
 
     @Data
@@ -147,6 +138,54 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+    @PostMapping("profile/follow/{followedId}")
+    public ResponseEntity<?> followUser(
+            @PathVariable("followedId") Integer followedId,
+            HttpSession session) {
+
+        Integer followerId = (Integer) session.getAttribute("userId");
+        System.out.println("Received followedId: " + followedId); // Debug log
+
+        System.out.println("Follow request from " + followerId + " to " + followedId);
+
+        if (followerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+
+        try {
+            UserRelationship relationship = relationshipService.followUser(followerId, followedId);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Followed successfully",
+                    "relationship", relationship
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/unfollow/{userId}")
+    public ResponseEntity<String> unfollowUser(@PathVariable Integer userId,
+                                               HttpSession session) {
+        Integer followerId = (Integer) session.getAttribute("userId");
+        if (followerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+
+        try {
+            boolean success = relationshipService.unfollow(followerId, userId);
+            return success ?
+                    ResponseEntity.ok("Unfollowed successfully") :
+                    ResponseEntity.badRequest().body("Not following this user");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error unfollowing user");
         }
     }
 }

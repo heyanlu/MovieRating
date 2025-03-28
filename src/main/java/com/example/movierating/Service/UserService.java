@@ -7,9 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
+import lombok.Builder;
 @Service
+
+
+@Builder
 public class UserService {
 
     @Resource
@@ -93,6 +97,10 @@ public class UserService {
 
     public User getUserByUserId(Integer userId) {
         return userDao.selectUserById(userId);
+    }
+
+    public List<User> getSuggestedUsers(Integer currentUserId) {
+        return userDao.findUsersNotFollowed(currentUserId);
     }
 
 
