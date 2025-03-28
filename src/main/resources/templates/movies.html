@@ -119,6 +119,12 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="#" th:href="@{/movies}">Movies</a>
                 </li>
+                <li class="nav-item" th:if="${session.username != null}">
+                    <span class="nav-link text-muted px-1">|</span>
+                </li>
+                <li class="nav-item" th:if="${session.username != null}">
+                    <a class="nav-link" th:href="@{/collections}">My Collections</a>
+                </li>
             </ul>
 
             <form class="d-flex" th:action="@{/movies/search}" method="get">
