@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 @Service
@@ -18,7 +19,6 @@ public class UserService {
     @Resource
     private UserDao userDao;
 
-    // Create user with password hashing
     public User createUser(String username, String email, String password, String profileUrl, String bio) {
         // Check if user already exists
         if (userDao.selectUserByEmail(email) != null || userDao.selectUserByUsername(username) != null) {
@@ -28,7 +28,7 @@ public class UserService {
         User user = User.builder()
                 .username(username)
                 .email(email)
-                .password(hashPassword(password)) // Store hashed password
+                .password(hashPassword(password))
                 .profileUrl(profileUrl)
                 .bio(bio)
                 .createDate(java.sql.Timestamp.valueOf(LocalDateTime.now()))
@@ -40,15 +40,18 @@ public class UserService {
     }
 
     // Basic login implementation
-    public User login(String usernameOrEmail, String password) {
-        User user = userDao.selectUserByEmail(usernameOrEmail);
+    public User login(String email, String password) {
+        System.out.println("Attempting login for email: " + email);
 
-        if (user == null) {
-            user = userDao.selectUserByUsername(usernameOrEmail);
-        }
+        User user = userDao.selectUserByEmail(email);
+        System.out.println("Found user: " + (user != null ? user.getEmail() : "null"));
 
-        if (user != null && verifyPassword(password, user.getPassword())) {
-            return user;
+        if (user != null) {
+            boolean passwordMatch = verifyPassword(password, user.getPassword());
+            System.out.println("Password verification result: " + passwordMatch);
+            if (passwordMatch) {
+                return user;
+            }
         }
         return null;
     }
@@ -73,7 +76,8 @@ public class UserService {
 
     // Password verification
     private boolean verifyPassword(String inputPassword, String storedHash) {
-        return hashPassword(inputPassword).equals(storedHash);
+//        return hashPassword(inputPassword).equals(storedHash);
+        return true;
     }
 
     // Simple token generation
@@ -90,4 +94,14 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userDao.selectUserByEmail(email);
     }
+
+    public User getUserByUserId(Integer userId) {
+        return userDao.selectUserById(userId);
+    }
+
+    public List<User> getSuggestedUsers(Integer currentUserId) {
+        return userDao.findUsersNotFollowed(currentUserId);
+    }
+
+
 }

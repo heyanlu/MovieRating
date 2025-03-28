@@ -2,6 +2,7 @@ package com.example.movierating.db.mappers;
 
 import com.example.movierating.db.po.User;
 import com.example.movierating.db.po.UserRelationship;
+
 import java.util.List;
 
 public interface UserRelationshipMapper {
@@ -17,9 +18,13 @@ public interface UserRelationshipMapper {
 
     int updateByPrimaryKey(UserRelationship record);
 
-    boolean relationshipExists(int followerId, int followedId);
+    int insertRelationship(UserRelationship relationship);
 
-    void insertRelationship(UserRelationship relationship);
+    boolean relationshipExists(Integer followerId, Integer followedId);
 
     List<User> selectFollowerIdsByUserId(Integer userId);
+
+    List<User> findByFollowing(Integer followerId);
+
+
 }

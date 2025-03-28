@@ -1,23 +1,23 @@
 package com.example.movierating.db.mappers;
 
 import com.example.movierating.db.po.User;
+import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
+@Mapper
 public interface UserMapper {
-    int deleteByPrimaryKey(Integer userId);
-
     int insert(User record);
 
     int insertSelective(User record);
 
-    User selectByPrimaryKey(Integer userId);
-
-    int updateByPrimaryKeySelective(User record);
-
-    int updateByPrimaryKeyWithBLOBs(User record);
-
-    int updateByPrimaryKey(User record);
+    User selectByPrimaryKey(Long id);
 
     User selectByUsername(String username);
 
     User selectByEmail(String email);
+
+    User selectByUserId(Integer id);
+
+    List<User> findUsersNotFollowed(Integer id);
 }

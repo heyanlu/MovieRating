@@ -5,16 +5,19 @@ import com.example.movierating.Service.UserService;
 import com.example.movierating.db.po.User;
 import com.example.movierating.db.po.UserRelationship;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+
 
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
 public class UserController {
 
     @Resource
@@ -23,64 +26,102 @@ public class UserController {
     @Resource
     private RelationshipService relationshipService;
 
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String handleLogin(
+            @RequestParam String email,
+            @RequestParam String password,
+            HttpSession session,
+            Model model) {
+
+        User user = userService.login(email, password);
+        if (user == null) {
+            model.addAttribute("error", "Invalid credentials");
+            return "login";
+        }
+
+        session.setAttribute("user", user);
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("userEmail", user.getEmail());
+        session.setAttribute("username", user.getUsername());
+
+        return "redirect:/movies";
+    }
+
+    @GetMapping("/register")
+    public String showRegisterForm(Model model) {
+        model.addAttribute("username", "");
+        model.addAttribute("email", "");
+        model.addAttribute("profileUrl", "");
+        model.addAttribute("bio", "");
+        return "register";
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(
+    public String register(
             @RequestParam String username,
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam(required = false) String profileUrl,
-            @RequestParam(required = false) String bio) {
+            @RequestParam(required = false) String bio,
+            HttpSession session,  // Add HttpSession parameter
+            Model model) {
 
         try {
             User user = userService.createUser(username, email, password, profileUrl, bio);
             if (user == null) {
-                return ResponseEntity.badRequest().body("Username or email already exists");
+                model.addAttribute("error", "Username or email already exists");
+                return "register";
             }
-            return ResponseEntity.ok("User registered successfully");
+
+            session.setAttribute("userEmail", user.getEmail());
+            session.setAttribute("username", user.getUsername());
+
+            return "redirect:/movies";
+
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Registration failed");
+            model.addAttribute("error", "Registration failed");
+            return "register";
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestParam String usernameOrEmail,
-            @RequestParam String password) {
+    @GetMapping("/profile")
+    public String showProfile(HttpSession session, Model model) {
+        String userEmail = (String) session.getAttribute("userEmail");
+        Integer userId = (Integer) session.getAttribute("userId");
 
-        User user = userService.login(usernameOrEmail, password);
+        if (userEmail == null) {
+            return "redirect:/login";
+        }
+
+        User user = userService.getUserByEmail(userEmail);
+
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid credentials"));
+            return "redirect:/login";
         }
-        return ResponseEntity.ok(user);
-    }
 
-    @PostMapping("/token-login")
-    public ResponseEntity<?> tokenLogin(
-            @RequestParam String usernameOrEmail,
-            @RequestParam String password) {
+        List<User> followers = relationshipService.getFollowerIds(userId);
+        List<User> following = relationshipService.getFollowing(userId);
+        List<User> suggestedUsers = userService.getSuggestedUsers(userId);
 
-        Map<String, Object> authResult = userService.loginWithToken(usernameOrEmail, password);
-        if (authResult == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid credentials"));
-        }
-        return ResponseEntity.ok(authResult);
-    }
 
-    @PostMapping("/{userId}/follow")
-    public ResponseEntity<UserRelationship> followUser(
-            @PathVariable Integer userId,
-            @RequestBody FollowRequest request) {
+        model.addAttribute("user", user);
+        model.addAttribute("followers", followers);
+        model.addAttribute("following", following);
+        model.addAttribute("followerCount", followers.size());
+        model.addAttribute("followingCount", following.size());
+        model.addAttribute("suggestedUsers", suggestedUsers);
 
-        try {
-            UserRelationship relationship = relationshipService.followUser(
-                    request.getFollowerId(),
-                    userId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(relationship);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+
+        System.out.println("Suggested Users: " + suggestedUsers);
+
+
+        return "profile";
     }
 
     @Data
@@ -88,7 +129,7 @@ public class UserController {
         private Integer followerId;
     }
 
-    @GetMapping("/{userId}/followers")
+    @GetMapping("/profile/followers")
     public ResponseEntity<List<User>> getFollowers(@PathVariable Integer userId) {
         try {
             List<User> followers = relationshipService.getFollowerIds(userId);
@@ -97,6 +138,54 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+    @PostMapping("profile/follow/{followedId}")
+    public ResponseEntity<?> followUser(
+            @PathVariable("followedId") Integer followedId,
+            HttpSession session) {
+
+        Integer followerId = (Integer) session.getAttribute("userId");
+        System.out.println("Received followedId: " + followedId); // Debug log
+
+        System.out.println("Follow request from " + followerId + " to " + followedId);
+
+        if (followerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+
+        try {
+            UserRelationship relationship = relationshipService.followUser(followerId, followedId);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Followed successfully",
+                    "relationship", relationship
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/unfollow/{userId}")
+    public ResponseEntity<String> unfollowUser(@PathVariable Integer userId,
+                                               HttpSession session) {
+        Integer followerId = (Integer) session.getAttribute("userId");
+        if (followerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+
+        try {
+            boolean success = relationshipService.unfollow(followerId, userId);
+            return success ?
+                    ResponseEntity.ok("Unfollowed successfully") :
+                    ResponseEntity.badRequest().body("Not following this user");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error unfollowing user");
         }
     }
 }
