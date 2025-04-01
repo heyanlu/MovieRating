@@ -25,6 +25,11 @@ public class MovieDaoImpl implements MovieDao {
     }
 
     @Override
+    public Movie queryMovieByTitle(String title) {
+        return movieMapper.selectByTitle(title);
+    }
+
+    @Override
     public int insertMovie(Movie movie) {
         return movieMapper.insert(movie);
     }

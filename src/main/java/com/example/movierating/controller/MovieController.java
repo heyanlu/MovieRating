@@ -76,13 +76,21 @@ public class MovieController {
 
 
 
-    @GetMapping("/movies/{movieId}")
-    public String getMovieDetails(@PathVariable Integer movieId, Model model) {
-        Movie movie = movieService.getMovieById(movieId);
-        if (movie == null) {
-            return "error";
+    @GetMapping("/movies/{title}")
+    public String getMovieDetails(@PathVariable String title,
+                                  Model model,
+                                  HttpSession session) {
+
+        if (session.getAttribute("userEmail") == null) {
+            return "redirect:/login";
         }
+
+        Movie movie = movieService.getMovieByTitle(title);
+        System.out.println("Retrieved movie: " + (movie != null ? movie.getTitle() : "null"));
+
         model.addAttribute("movie", movie);
+        model.addAttribute("username", session.getAttribute("username"));
+
         return "movie-detail";
     }
 

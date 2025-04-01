@@ -9,6 +9,8 @@ public interface MovieDao {
 
     Movie queryMovieById(Integer movieId);
 
+    Movie queryMovieByTitle(String title);
+
     int insertMovie(Movie movie);
 
     int updateMovie(Movie movie);

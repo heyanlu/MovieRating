@@ -24,6 +24,10 @@ public class MovieService {
         return movieDao.queryMovieById(movieId);
     }
 
+    public Movie getMovieByTitle(String title) {
+        return movieDao.queryMovieByTitle(title);
+    }
+
     public int addMovie(Movie movie) {
         return movieDao.insertMovie(movie);
     }

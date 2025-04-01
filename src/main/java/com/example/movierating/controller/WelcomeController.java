@@ -6,6 +6,6 @@ public class WelcomeController {
 
     @GetMapping("/")
     public String welcome() {
-        return "welcome"; // This should match your welcome.html template name
+        return "welcome";
     }
 }

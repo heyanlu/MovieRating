@@ -10,7 +10,7 @@ public interface MovieMapper {
 
     int insertSelective(Movie record);
 
-    Movie selectByPrimaryKey(Integer movieTitle);
+    Movie selectByPrimaryKey(int movieId);
 
     int updateByPrimaryKeySelective(Movie record);
 
@@ -21,4 +21,6 @@ public interface MovieMapper {
     List<Movie> selectMovies(int offset, int limit);
 
     List<Movie> searchMovies(String keywordPattern);
+
+    Movie selectByTitle(String title);
 }

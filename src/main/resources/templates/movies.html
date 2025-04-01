@@ -219,13 +219,15 @@
                         <span th:text="${movie.duration} ? ${movie.duration + ' min'} : 'Duration unknown'"></span>
                     </p>
                     <div class="d-flex justify-content-between">
-                        <a
-                           th:href="@{/movies/{movieId}(movieId=${movie.movieId})}"
+                        <!-- Safe navigation with null check -->
+                        <a th:if="${movie?.title != null}"
+                           th:href="@{'/movies/' + ${movie.title}}"
                            class="btn btn-primary btn-sm">
                             Details
                         </a>
-
-                        <i class="fas fa-star"></i> Rate
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-star"></i> Rate
+                        </button>
                     </div>
                 </div>
             </div>

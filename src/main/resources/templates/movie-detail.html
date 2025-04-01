@@ -5,12 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${movie.title} + ' | Movie Details'"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">MovieRatings</a>
-        <a class="btn btn-outline-light" th:href="@{/movies}">Back to Movies</a>
+        <div class="d-flex">
+            <a class="btn btn-outline-light me-2" th:href="@{/movies}">
+                <i class="fas fa-arrow-left"></i> Back to Movies
+            </a>
+            <span class="navbar-text text-light me-3" th:if="${username}">
+                Welcome, <span th:text="${username}"></span>
+            </span>
+            <form th:if="${username}" th:action="@{/logout}" method="post">
+                <button class="btn btn-outline-light" type="submit">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
 </nav>
 
@@ -19,123 +32,174 @@
         <div class="col-md-4">
             <img th:src="@{'/images/green_book.jpg'}"
                  th:alt="${movie.title}"
-                 class="img-fluid rounded">
+                 class="img-fluid rounded shadow">
         </div>
         <div class="col-md-8">
             <h1 th:text="${movie.title}"></h1>
             <div class="mb-3">
                 <span class="badge bg-primary me-2" th:text="${movie.genre}"></span>
-                <span th:text="${movie.duration} + ' min'"></span>
+                <span class="text-muted" th:text="${movie.duration} + ' min'"></span>
             </div>
             <p class="lead" th:text="${movie.description}"></p>
+
             <div class="mt-4">
                 <h4>Details</h4>
                 <ul class="list-unstyled">
                     <li><strong>Director:</strong> <span th:text="${movie.director}"></span></li>
-                    <li><strong>Release Year:</strong> <span th:text="${movie.releaseYear}"></span></li>
-                    <li><strong>Rating:</strong> <span id="avgRating">-</span>/10</li>
+                    <li><strong>Release Year:</strong> <span th:text="${movie.releaseDate}"></span></li>
+                    <li><strong>Average Rating:</strong> <span id="avgRating">-</span>/10</li>
                 </ul>
             </div>
-            <div class="mt-3">
-                <button th:if="${!inCollection}" class="btn btn-primary"
-                        onclick="addToCollection([[${movie.movieId}]])">
-                    <i class="fas fa-bookmark me-1"></i> Add to My Collection
-                </button>
 
-                <button th:if="${inCollection}" class="btn btn-outline-primary"
-                        onclick="removeFromCollection([[${movie.movieId}]])">
-                    <i class="fas fa-bookmark me-1"></i> In Collection (Click to Remove)
-                </button>
-            </div>
+<!--            <div class="mt-4">-->
+<!--                <button th:if="${!inCollection}" class="btn btn-primary me-2"-->
+<!--                        onclick="addToCollection([[${movie.movieId}]])">-->
+<!--                    <i class="fas fa-bookmark"></i> Add to Collection-->
+<!--                </button>-->
+<!--                <button th:if="${inCollection}" class="btn btn-outline-danger"-->
+<!--                        onclick="removeFromCollection([[${movie.movieId}]])">-->
+<!--                    <i class="fas fa-trash-alt"></i> Remove from Collection-->
+<!--                </button>-->
+<!--            </div>-->
         </div>
     </div>
 
     <!-- Rating Section -->
     <hr class="my-4">
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-md-6">
-            <h4>Submit Your Rating</h4>
-            <form onsubmit="submitRating(event)">
-                <div class="mb-2">
-                    <label>User ID</label>
-                    <input type="number" id="userId" class="form-control" required>
+            <h4>Rate This Movie</h4>
+            <form id="ratingForm" class="border p-3 rounded">
+                <div class="mb-3">
+                    <label class="form-label">Your Rating (1-10)</label>
+                    <select id="score" class="form-select" required>
+                        <option value="">Select rating</option>
+                        <option th:each="i : ${#numbers.sequence(1, 10)}"
+                                th:value="${i}"
+                                th:text="${i}"></option>
+                    </select>
                 </div>
-                <div class="mb-2">
-                    <label>Score (1–10)</label>
-                    <input type="number" id="score" class="form-control" min="1" max="10" required>
-                </div>
-                <div class="mb-2">
-                    <label>Comment</label>
+                <div class="mb-3">
+                    <label class="form-label">Your Review</label>
                     <textarea id="comment" class="form-control" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-success mt-2">Submit Rating</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-star"></i> Submit Rating
+                </button>
             </form>
         </div>
         <div class="col-md-6">
-            <h4>User Ratings</h4>
-            <div id="ratingList" class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;"></div>
+            <h4>User Reviews</h4>
+            <div id="ratingList" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                <!-- Ratings will be loaded here -->
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     const movieId = [[${movie.movieId}]];
+    const userId = [[${session.userId}]]; // Get userId from session
 
+    // Collection functions
     function addToCollection(movieId) {
-        fetch(`/api/collections/movies/${movieId}`, { method: 'POST' })
-        .then(response => response.ok ? location.reload() : alert('Unable to add to collection'))
-        .catch(error => console.error('Error:', error));
+        fetch(`/api/collections/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ movieId: movieId, userId: userId })
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to add to collection');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function removeFromCollection(movieId) {
-        fetch(`/api/collections/movies/${movieId}`, { method: 'DELETE' })
-        .then(response => response.ok ? location.reload() : alert('Unable to remove from collection'))
-        .catch(error => console.error('Error:', error));
+        fetch(`/api/collections/user/${userId}/movie/${movieId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to remove from collection');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
 
-    function submitRating(event) {
-        event.preventDefault();
-        const userId = document.getElementById('userId').value;
+    // Rating functions
+    document.getElementById('ratingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
         const score = document.getElementById('score').value;
         const comment = document.getElementById('comment').value;
 
-        fetch('/api/ratings/rate', {
+        fetch('/api/ratings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, movieId, score, comment })
+            body: JSON.stringify({
+                userId: userId,
+                movieId: movieId,
+                score: score,
+                comment: comment
+            })
         })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => {
-            alert('Rating submitted!');
-            loadRatings();
-        })
-        .catch(() => alert('Failed to submit rating'));
-    }
+            .then(response => {
+                if (response.ok) {
+                    loadRatings();
+                    document.getElementById('ratingForm').reset();
+                    alert('Rating submitted successfully!');
+                } else {
+                    alert('Failed to submit rating');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
 
     function loadRatings() {
-        fetch(`/api/ratings/movie/${movieId}/avg`)
-        .then(res => res.ok ? res.json() : null)
-        .then(avg => {
-            document.getElementById('avgRating').innerText = avg ? avg.toFixed(1) : '-';
-        });
-
-        fetch(`/api/movies/${movieId}/ratings`)
-        .then(res => res.ok ? res.json() : [])
-        .then(ratings => {
-            const container = document.getElementById('ratingList');
-            container.innerHTML = '';
-            ratings.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'mb-2';
-                div.innerHTML = `<strong>User:</strong> ${r.username || 'Anonymous'}<br>
-                                     <strong>Score:</strong> ${r.score}<br>
-                                     <strong>Comment:</strong> ${r.comment}`;
-                container.appendChild(div);
+        // Load average rating
+        fetch(`/api/movies/${movieId}/ratings/avg`)
+            .then(res => res.json())
+            .then(avg => {
+                document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
             });
-        });
+
+        // Load all ratings
+        fetch(`/api/movies/${movieId}/ratings`)
+            .then(res => res.json())
+            .then(ratings => {
+                const container = document.getElementById('ratingList');
+                container.innerHTML = '';
+
+                if (ratings.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">No reviews yet</div>';
+                    return;
+                }
+
+                ratings.forEach(rating => {
+                    const ratingElement = document.createElement('div');
+                    ratingElement.className = 'list-group-item';
+                    ratingElement.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">User ${rating.userId}</h6>
+                        <small class="text-muted">${new Date(rating.createDate).toLocaleDateString()}</small>
+                    </div>
+                    <div class="mb-1">
+                        <span class="badge bg-warning text-dark">${rating.score}/10</span>
+                    </div>
+                    <p class="mb-1">${rating.comment || 'No comment'}</p>
+                `;
+                    container.appendChild(ratingElement);
+                });
+            });
     }
 
-
+    // Load ratings when page loads
     document.addEventListener('DOMContentLoaded', loadRatings);
 </script>
 </body>
