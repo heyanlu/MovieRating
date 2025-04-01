@@ -81,5 +81,5 @@ A comprehensive social platform for movie enthusiasts to discover, rate, and dis
    mvn spring-boot:run
    ```
 
-Access the platform at: http://localhost:8082/movies
+Access the platform at: http://localhost:8082
 

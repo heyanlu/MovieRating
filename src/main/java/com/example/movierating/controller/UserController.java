@@ -32,6 +32,15 @@ public class UserController {
         return "login";
     }
 
+    @GetMapping("/")
+    public String welcome(HttpSession session) {
+        if (session.getAttribute("userEmail") != null) {
+            return "redirect:/movies";
+        }
+        return "welcome";
+    }
+
+
     @PostMapping("/login")
     public String handleLogin(
             @RequestParam String email,

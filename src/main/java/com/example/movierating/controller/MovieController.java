@@ -3,6 +3,7 @@ package com.example.movierating.controller;
 import com.example.movierating.Service.MovieService;
 import com.example.movierating.db.po.Movie;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,15 +21,37 @@ public class MovieController {
     /* ============== Thymeleaf View Endpoints ============== */
 
     @GetMapping("/movies")
+//    public String getMoviesView(
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "12") int limit,
+//            Model model) {
+//        List<Movie> movies = movieService.getMovies(page, limit);
+//        model.addAttribute("movies", movies);
+//        model.addAttribute("currentPage", page);
+//        model.addAttribute("limit", limit);
+//        model.addAttribute("isSearch", false);
+//        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
+//
+//        return "movies";
+//    }
     public String getMoviesView(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int limit,
-            Model model) {
+            Model model,
+            HttpSession session) {
+
+        if (session.getAttribute("userEmail") == null) {
+            return "redirect:/";
+        }
+
         List<Movie> movies = movieService.getMovies(page, limit);
         model.addAttribute("movies", movies);
         model.addAttribute("currentPage", page);
         model.addAttribute("limit", limit);
         model.addAttribute("isSearch", false);
+
+        model.addAttribute("username", session.getAttribute("username"));
+
         movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
 
         return "movies";
