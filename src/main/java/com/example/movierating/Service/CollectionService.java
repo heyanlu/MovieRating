@@ -1,20 +1,21 @@
 package com.example.movierating.Service;
 
 import com.example.movierating.db.po.Collection;
+import java.util.List;
 
 public interface CollectionService {
     /**
-     * 获取用户的收藏夹
+     * 获取用户的收藏夹（包含所有收藏的电影）
      * @param userId 用户ID
      * @return 用户的收藏夹，如果不存在则返回null
      */
-    Collection getUserCollection(Integer userId);
+    List<Collection> getUserCollection(Integer userId);
 
     /**
      * 添加电影到用户收藏夹
      * @param userId 用户ID
      * @param movieId 电影ID
-     * @return 更新后的收藏夹
+     * @return 新增的收藏记录
      */
     Collection addMovieToUserCollection(Integer userId, Integer movieId);
 

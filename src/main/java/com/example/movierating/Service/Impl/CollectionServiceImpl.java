@@ -1,14 +1,12 @@
 package com.example.movierating.Service.Impl;
-
 import com.example.movierating.Service.CollectionService;
 import com.example.movierating.db.dao.CollectionDao;
 import com.example.movierating.db.po.Collection;
+import java.util.Date;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -17,12 +15,10 @@ public class CollectionServiceImpl implements CollectionService {
     private CollectionDao collectionDao;
 
     @Override
-    public Collection getUserCollection(Integer userId) {
-        // 获取用户的收藏夹
+    public List<Collection> getUserCollection(Integer userId) {
+        // 获取用户的所有收藏记录
         List<Collection> collections = collectionDao.getCollectionsByUserId(userId);
-        // 如果用户有收藏记录，返回第一条记录作为收藏夹
-        // 实际上需要根据具体实现调整，可能需要在数据库中添加一个标识字段
-        return collections != null && !collections.isEmpty() ? collections.get(0) : null;
+        return collections;
     }
 
     @Override

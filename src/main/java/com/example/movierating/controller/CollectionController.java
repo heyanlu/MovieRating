@@ -1,6 +1,5 @@
 package com.example.movierating.controller;
 
-
 import com.example.movierating.Service.CollectionService;
 import com.example.movierating.db.po.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/collections")
 public class CollectionController {
-
     @Autowired
     private CollectionService collectionService;
 
@@ -25,12 +23,12 @@ public class CollectionController {
      * API: GET /api/collections/user/{user_id}
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Collection> getUserCollection(@PathVariable("userId") Integer userId) {
-        Collection collection = collectionService.getUserCollection(userId);
-        if (collection == null) {
+    public ResponseEntity<List<Collection>> getUserCollection(@PathVariable("userId") Integer userId) {
+        List<Collection> collections = collectionService.getUserCollection(userId);
+        if (collections == null || collections.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(collection, HttpStatus.OK);
+        return new ResponseEntity<>(collections, HttpStatus.OK);
     }
 
     /**
@@ -71,10 +69,8 @@ public class CollectionController {
         @PathVariable("userId") Integer userId,
         @PathVariable("movieId") Integer movieId) {
         boolean success = collectionService.removeMovieFromCollection(userId, movieId);
-
         Map<String, Object> response = new HashMap<>();
         response.put("success", success);
-
         return new ResponseEntity<>(response, success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 }
