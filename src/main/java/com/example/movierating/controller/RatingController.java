@@ -5,6 +5,7 @@ import com.example.movierating.db.po.Rating;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,16 @@ public class RatingController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(avgRating);
+    }
+
+    /**
+     * 获取电影的所有评分和评论
+     * API: GET /api/ratings/movie/{movieId}
+     */
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<List<Rating>> getMovieRatings(@PathVariable Integer movieId) {
+        List<Rating> ratings = ratingService.getMovieRatings(movieId);
+        return ResponseEntity.ok(ratings);
     }
 
 

@@ -18,6 +18,16 @@ public class Rating {
 
     private String comment;
 
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public Integer getRatingId() {
         return ratingId;
     }

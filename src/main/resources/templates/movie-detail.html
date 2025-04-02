@@ -6,6 +6,7 @@
     <title th:text="${movie.title} + ' | Movie Details'"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" th:href="@{/images/icon.png}" type="image/png">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -140,9 +141,7 @@
 </div>
 
 <script>
-    // 获取电影ID和用户ID
-    const movieId = [[${movie.movieId}]];
-    const userId = [[${session.userId}]]; // Get userId from session
+
 
     // 添加调试信息
     console.log('电影ID:', movieId);
@@ -315,21 +314,21 @@
                 return;
             }
 
-            ratings.forEach(rating => {
-                const ratingElement = document.createElement('div');
-                ratingElement.className = 'list-group-item';
-                ratingElement.innerHTML = `
-                    <div class="d-flex justify-content-between">
-                        <h6 class="mb-1">用户 ${rating.userId}</h6>
-                        <small class="text-muted">${new Date(rating.createDate).toLocaleDateString()}</small>
-                    </div>
-                    <div class="mb-1">
-                        <span class="badge bg-warning text-dark">${rating.score}/10</span>
-                    </div>
-                    <p class="mb-1">${rating.comment || '没有评论内容'}</p>
-                `;
-                container.appendChild(ratingElement);
-            });
+            ratings.reverse().forEach(rating => {
+              const ratingElement = document.createElement('div');
+              ratingElement.className = 'list-group-item';
+              ratingElement.innerHTML = `
+                  <div class="d-flex justify-content-between">
+                      <h6 class="mb-1">${rating.username || '用户 ' + rating.userId}</h6>
+                      <small class="text-muted">${new Date(rating.createDate).toLocaleDateString()}</small>
+                  </div>
+                  <div class="mb-1">
+                      <span class="badge bg-warning text-dark">${rating.score}/10</span>
+                  </div>
+                  <p class="mb-1">${rating.comment || '没有评论内容'}</p>
+              `;
+              container.appendChild(ratingElement);
+          });
         })
         .catch(error => {
             console.error('加载评分列表错误:', error);

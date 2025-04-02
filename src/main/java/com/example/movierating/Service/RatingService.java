@@ -1,6 +1,7 @@
 package com.example.movierating.Service;
 
 import com.example.movierating.db.po.Rating;
+import java.util.List;
 
 public interface RatingService {
     /**
@@ -18,4 +19,6 @@ public interface RatingService {
     //     */
     //    Rating getRatingByUserAndMovie(Integer userId, Integer movieId);
     Double getMovieAvgRating(Integer movieId);
+
+    List<Rating> getMovieRatings(Integer movieId);
 }

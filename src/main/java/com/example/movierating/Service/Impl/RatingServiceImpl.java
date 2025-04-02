@@ -2,6 +2,7 @@ package com.example.movierating.Service.Impl;
 
 import com.example.movierating.Service.RatingService;
 import com.example.movierating.db.dao.RatingDao;
+import com.example.movierating.db.mappers.RatingMapper;
 import com.example.movierating.db.po.Rating;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Autowired
     private RatingDao ratingDao;
+    @Autowired
+    private RatingMapper ratingMapper;
 
     @Override
     @Transactional
@@ -58,7 +61,9 @@ public class RatingServiceImpl implements RatingService {
         return sum / ratings.size();
     }
 
-
-
+    @Override
+    public List<Rating> getMovieRatings(Integer movieId) {
+        return ratingMapper.findByMovieId(movieId);
+    }
 
 }

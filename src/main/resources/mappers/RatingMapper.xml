@@ -12,8 +12,12 @@
     <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
   </resultMap>
 
+
+
+
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.example.movierating.db.po.Rating">
     <result column="comment" jdbcType="LONGVARCHAR" property="comment" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
   </resultMap>
 
   <sql id="Base_Column_List">
@@ -28,8 +32,12 @@
   <select id="getMovieAvgRating" parameterType="java.lang.Integer" resultType="java.lang.Double">
     SELECT avg_rating FROM movie WHERE movie_id = #{movieId}
   </select>
-  <select id="findByMovieId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    SELECT * FROM rating WHERE movie_id = #{movieId}
+  <select id="findByMovieId" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    SELECT r.*, u.username
+    FROM rating r
+    LEFT JOIN user u ON r.user_id = u.user_id
+    WHERE r.movie_id = #{movieId}
+    ORDER BY r.create_date DESC
   </select>
   <select id="findByUserIdAndMovieId" parameterType="map" resultMap="BaseResultMap">
     SELECT * FROM rating WHERE user_id = #{userId} AND movie_id = #{movieId} LIMIT 1
