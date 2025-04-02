@@ -84,8 +84,31 @@
     </div>
 
     <!-- Rating Section -->
+<!--    <hr class="my-4">-->
+<!--    <div class="row mt-4">-->
+    <!-- Rating Section -->
     <hr class="my-4">
-    <div class="row mt-4">
+
+    <!-- 当view参数为rating时，只显示平均评分的简洁界面 -->
+    <div th:if="${param.view != null && param.view[0] == 'rating'}" class="row mt-4">
+        <div class="col-12 text-center">
+            <h2>Rating Summary</h2>
+            <div style="width: 120px; height: 120px; border-radius: 50%; background-color: #f8f9fa; border: 3px solid #4a6bff; display: flex; align-items: center; justify-content: center; margin: 0 auto; margin-top: 20px;">
+                <span id="ratingCircle" style="font-size: 36px; font-weight: bold;">-</span><span style="font-size: 18px; font-weight: bold;">/10</span>
+            </div>
+            <div style="margin-top: 20px; color: #ffc107; font-size: 24px;">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+            </div>
+            <p class="text-muted mt-3">Based on user reviews</p>
+        </div>
+    </div>
+
+    <!-- 当view参数不是rating时，显示完整的评分表单和评论列表 -->
+    <div th:unless="${param.view != null && param.view[0] == 'rating'}" class="row mt-4">
         <div class="col-md-6">
             <h4>Rate This Movie</h4>
             <form id="ratingForm" class="border p-3 rounded">
@@ -117,170 +140,209 @@
 </div>
 
 <script>
-<!--    const movieId = [[${movie.movieId}]];-->
-<!--    const movieId = [[${movie != null && movie.movieId != null ? movie.movieId : 0}]];-->
-<!--    const userId = [[${session.userId}]]; // Get userId from session-->
-    // 从URL中获取movieId
-    let movieId;
-    const pathParts = window.location.pathname.split('/');
-    if (pathParts.length > 2 && pathParts[1] === 'movies') {
-        movieId = parseInt(pathParts[2]);
-    } else {
-        // 如果无法从URL获取，尝试从Thymeleaf变量获取
-        movieId = [[${movie != null && movie.movieId != null ? movie.movieId : 0}]];
-    }
-
-    // 记录一下movieId用于调试
-    console.log('电影ID:', movieId);
-
+    // 获取电影ID和用户ID
+    const movieId = [[${movie.movieId}]];
     const userId = [[${session.userId}]]; // Get userId from session
+
+    // 添加调试信息
+    console.log('电影ID:', movieId);
     console.log('用户ID:', userId);
 
     // Collection functions
     function addToCollection(movieId) {
+        if (!userId) {
+            alert('请先登录再添加到收藏');
+            return;
+        }
+
         fetch(`/api/collections/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ movie_id: movieId, user_id: userId })
         })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Failed to add to collection');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            console.log('添加到收藏响应状态:', response.status);
+            if (response.ok) {
+                location.reload();
+            } else {
+                throw new Error('添加到收藏失败');
+            }
+        })
+        .catch(error => {
+            console.error('错误:', error);
+            alert('添加到收藏失败: ' + error.message);
+        });
     }
 
     function removeFromCollection(movieId) {
+        if (!userId) {
+            alert('请先登录再从收藏中移除');
+            return;
+        }
+
         fetch(`/api/collections/user/${userId}/movie/${movieId}`, {
             method: 'DELETE'
         })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Failed to remove from collection');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            console.log('从收藏中移除响应状态:', response.status);
+            if (response.ok) {
+                location.reload();
+            } else {
+                throw new Error('从收藏中移除失败');
+            }
+        })
+        .catch(error => {
+            console.error('错误:', error);
+            alert('从收藏中移除失败: ' + error.message);
+        });
     }
 
     // Rating functions
-<!--    document.getElementById('ratingForm').addEventListener('submit', function(e) {-->
-<!--        e.preventDefault();-->
-
-<!--        const score = document.getElementById('score').value;-->
-<!--        const comment = document.getElementById('comment').value;-->
-
-<!--        fetch('/api/ratings/rate', {-->
-<!--            method: 'POST',-->
-<!--            headers: { 'Content-Type': 'application/json' },-->
-<!--            body: JSON.stringify({-->
-<!--                userId: userId,-->
-<!--                movieId: movieId,-->
-<!--                score: score,-->
-<!--                comment: comment-->
-<!--            })-->
-<!--        })-->
-<!--            .then(response => {-->
-<!--                if (response.ok) {-->
-<!--                    loadRatings();-->
-<!--                    document.getElementById('ratingForm').reset();-->
-<!--                    alert('Rating submitted successfully!');-->
-<!--                } else {-->
-<!--                    alert('Failed to submit rating');-->
-<!--                }-->
-<!--            })-->
-<!--            .catch(error => console.error('Error:', error));-->
-<!--    });-->
     document.getElementById('ratingForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      const score = document.getElementById('score').value;
-      const comment = document.getElementById('comment').value;
+        const score = document.getElementById('score').value;
+        const comment = document.getElementById('comment').value;
 
-      // 调试信息
-      console.log('提交评分:', { userId, movieId, score, comment });
+        // 验证输入
+        if (!score) {
+            alert('请选择评分');
+            return;
+        }
 
-      if (!userId || userId <= 0) {
-          alert('请先登录再评分');
-          return;
-      }
+        // 检查用户是否登录
+        if (!userId) {
+            alert('请先登录再评分');
+            return;
+        }
 
-      if (!movieId || movieId <= 0) {
-          alert('电影ID无效');
-          return;
-      }
+        // 显示提交状态
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
 
-      fetch('/api/ratings/rate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              userId: userId,
-              movieId: movieId,
-              score: parseInt(score),
-              comment: comment
-          })
-      })
-      .then(response => {
-          if (response.ok) {
-              return response.json();
-          }
-          throw new Error('评分提交失败');
-      })
-      .then(data => {
-          console.log('评分提交成功:', data);
-          loadRatings();
-          document.getElementById('ratingForm').reset();
-          alert('评分提交成功！');
-      })
-      .catch(error => {
-          console.error('错误:', error);
-          alert('评分提交失败: ' + error.message);
-      });
+        console.log('提交评分:', {
+            userId: userId,
+            movieId: movieId,
+            score: score,
+            comment: comment
+        });
+
+        // 使用正确的API端点 /api/ratings/rate
+        fetch('/api/ratings/rate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: Number(userId),
+                movieId: Number(movieId),
+                score: parseInt(score),  // 确保转换为数字
+                comment: comment
+            })
+        })
+        .then(response => {
+            console.log('评分提交响应状态:', response.status);
+            if (response.ok) {
+                return response.json().catch(() => ({})); // 处理空响应
+            } else {
+                throw new Error('评分提交失败');
+            }
+        })
+        .then(data => {
+            console.log('评分提交成功:', data);
+            loadRatings();
+            document.getElementById('ratingForm').reset();
+            alert('评分提交成功！');
+        })
+        .catch(error => {
+            console.error('错误:', error);
+            alert('评分提交失败: ' + error.message);
+        })
+        .finally(() => {
+            // 恢复按钮状态
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        });
     });
 
     function loadRatings() {
-        // Load average rating
+        console.log('加载电影ID:', movieId, '的评分');
+
+        // 使用控制器中定义的端点 /api/ratings/movie/{movieId}/avg
         fetch(`/api/ratings/movie/${movieId}/avg`)
+        .then(response => {
+            console.log('平均评分响应状态:', response.status);
+            if (!response.ok) {
+                throw new Error('加载平均评分失败');
+            }
+            return response.json();
+        })
+        // .then(avg => {
+        //     console.log('平均评分:', avg);
+        //     document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
+        // })
+        .then(avg => {
+            console.log('平均评分:', avg);
+            document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
 
-            .then(res => res.json())
-            .then(avg => {
-                document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
-            });
+            // 同时更新评分圆圈（如果存在）
+            const ratingCircle = document.getElementById('ratingCircle');
+            if (ratingCircle) {
+                ratingCircle.textContent = avg ? avg.toFixed(1) : '-';
+            }
+        })
+        .catch(error => {
+            console.error('加载平均评分错误:', error);
+            document.getElementById('avgRating').textContent = '-';
+        });
 
-        // Load all ratings
-        fetch(`/api/movies/${movieId}/ratings`)
-            .then(res => res.json())
-            .then(ratings => {
-                const container = document.getElementById('ratingList');
-                container.innerHTML = '';
+        // 加载所有评分 - 假设已经实现了获取所有评分的后端API
+        fetch(`/api/ratings/movie/${movieId}`)
+        .then(response => {
+            console.log('评分列表响应状态:', response.status);
+            if (!response.ok) {
+                throw new Error('加载评分列表失败');
+            }
+            return response.json();
+        })
+        .then(ratings => {
+            console.log('获取到的评分:', ratings);
+            const container = document.getElementById('ratingList');
+            container.innerHTML = '';
 
-                if (ratings.length === 0) {
-                    container.innerHTML = '<div class="alert alert-info">No reviews yet</div>';
-                    return;
-                }
+            if (!ratings || ratings.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">暂无评论</div>';
+                return;
+            }
 
-                ratings.forEach(rating => {
-                    const ratingElement = document.createElement('div');
-                    ratingElement.className = 'list-group-item';
-                    ratingElement.innerHTML = `
+            ratings.forEach(rating => {
+                const ratingElement = document.createElement('div');
+                ratingElement.className = 'list-group-item';
+                ratingElement.innerHTML = `
                     <div class="d-flex justify-content-between">
-                        <h6 class="mb-1">User ${rating.userId}</h6>
+                        <h6 class="mb-1">用户 ${rating.userId}</h6>
                         <small class="text-muted">${new Date(rating.createDate).toLocaleDateString()}</small>
                     </div>
                     <div class="mb-1">
                         <span class="badge bg-warning text-dark">${rating.score}/10</span>
                     </div>
-                    <p class="mb-1">${rating.comment || 'No comment'}</p>
+                    <p class="mb-1">${rating.comment || '没有评论内容'}</p>
                 `;
-                    container.appendChild(ratingElement);
-                });
+                container.appendChild(ratingElement);
             });
+        })
+        .catch(error => {
+            console.error('加载评分列表错误:', error);
+            document.getElementById('ratingList').innerHTML =
+                '<div class="alert alert-danger">加载评论失败</div>';
+        });
     }
 
+    // 页面加载时加载评分
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('页面加载完成，初始化...');
+        loadRatings();
+    });
     // Load ratings when page loads
     document.addEventListener('DOMContentLoaded', loadRatings);
 
