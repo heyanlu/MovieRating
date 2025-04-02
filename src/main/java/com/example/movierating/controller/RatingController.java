@@ -2,6 +2,10 @@ package com.example.movierating.controller;
 
 import com.example.movierating.Service.RatingService;
 import com.example.movierating.db.po.Rating;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +21,24 @@ public class RatingController {
      * 添加或更新评分
      * API: POST /api/ratings/rate
      */
+//    @PostMapping("/rate")
+//    public ResponseEntity<Rating> addOrUpdateRating(@RequestBody Rating rating) {
+//        Rating savedRating = ratingService.addOrUpdateRating(rating);
+//        return ResponseEntity.ok(savedRating);
+//    }
+
     @PostMapping("/rate")
-    public ResponseEntity<Rating> addOrUpdateRating(@RequestBody Rating rating) {
-        Rating savedRating = ratingService.addOrUpdateRating(rating);
-        return ResponseEntity.ok(savedRating);
+    public ResponseEntity<Rating> addOrUpdateRating(@RequestBody String jsonBody, HttpServletRequest request) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Rating rating = mapper.readValue(jsonBody, Rating.class);
+            Rating savedRating = ratingService.addOrUpdateRating(rating);
+            return ResponseEntity.ok(savedRating);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-//    /**
-//     * 获取用户对电影的评分
-//     * API: GET /api/ratings/user/{userId}/movie/{movieId}
-//     */
-//    @GetMapping("/user/{userId}/movie/{movieId}")
-//    public ResponseEntity<Rating> getRatingByUserAndMovie(
-//        @PathVariable Integer userId,
-//        @PathVariable Integer movieId) {
-//        Rating rating = ratingService.getRatingByUserAndMovie(userId, movieId);
-//        if (rating == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok(rating);
-//    }
     /**
      * 获取电影的平均评分
      * API: GET /api/ratings/movie/{movieId}/avg

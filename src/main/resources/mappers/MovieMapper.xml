@@ -31,7 +31,7 @@
     from Movie
     where movie_id = #{movieId,jdbcType=INTEGER}
   </select>
-  <select id="selectMovies" resultType="com.example.movierating.db.po.Movie">
+  <select id="selectMovies" resultMap="ResultMapWithBLOBs">
     select
     <include refid="Base_Column_List" />
     ,
@@ -39,7 +39,7 @@
     from Movie
     LIMIT #{limit} OFFSET #{offset}
   </select>
-  <select id="searchMovies" resultType="com.example.movierating.db.po.Movie">
+  <select id="searchMovies" resultMap="ResultMapWithBLOBs">
     SELECT
     <include refid="Base_Column_List" />
     ,
@@ -57,7 +57,7 @@
     title ASC
     LIMIT 50
   </select>
-  <select id="selectByTitle" resultType="com.example.movierating.db.po.Movie">
+  <select id="selectByTitle" resultMap="ResultMapWithBLOBs">
     select
     <include refid="Base_Column_List" />
     ,

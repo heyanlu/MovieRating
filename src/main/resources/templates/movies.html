@@ -220,10 +220,14 @@
                     </p>
                     <div class="d-flex justify-content-between">
                         <!-- Safe navigation with null check -->
-                        <a th:if="${movie?.title != null}"
-                           th:href="@{'/movies/' + ${movie.title}}"
+<!--                        <a th:if="${movie?.movieId != null}"-->
+<!--                           th:href="@{'/movies/' + ${movie.movieId}}"-->
+<!--                           class="btn btn-primary btn-sm">-->
+<!--                            Details-->
+<!--                        </a>-->
+                        <a th:href="@{'/movies/' + ${movie.movieId}}"
                            class="btn btn-primary btn-sm">
-                            Details
+                          Details
                         </a>
                         <button class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-star"></i> Rate

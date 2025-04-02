@@ -98,8 +98,24 @@
 </div>
 
 <script>
-    const movieId = [[${movie.movieId}]];
+<!--    const movieId = [[${movie.movieId}]];-->
+<!--    const movieId = [[${movie != null && movie.movieId != null ? movie.movieId : 0}]];-->
+<!--    const userId = [[${session.userId}]]; // Get userId from session-->
+    // 从URL中获取movieId
+    let movieId;
+    const pathParts = window.location.pathname.split('/');
+    if (pathParts.length > 2 && pathParts[1] === 'movies') {
+        movieId = parseInt(pathParts[2]);
+    } else {
+        // 如果无法从URL获取，尝试从Thymeleaf变量获取
+        movieId = [[${movie != null && movie.movieId != null ? movie.movieId : 0}]];
+    }
+
+    // 记录一下movieId用于调试
+    console.log('电影ID:', movieId);
+
     const userId = [[${session.userId}]]; // Get userId from session
+    console.log('用户ID:', userId);
 
     // Collection functions
     function addToCollection(movieId) {
@@ -133,37 +149,84 @@
     }
 
     // Rating functions
+<!--    document.getElementById('ratingForm').addEventListener('submit', function(e) {-->
+<!--        e.preventDefault();-->
+
+<!--        const score = document.getElementById('score').value;-->
+<!--        const comment = document.getElementById('comment').value;-->
+
+<!--        fetch('/api/ratings/rate', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({-->
+<!--                userId: userId,-->
+<!--                movieId: movieId,-->
+<!--                score: score,-->
+<!--                comment: comment-->
+<!--            })-->
+<!--        })-->
+<!--            .then(response => {-->
+<!--                if (response.ok) {-->
+<!--                    loadRatings();-->
+<!--                    document.getElementById('ratingForm').reset();-->
+<!--                    alert('Rating submitted successfully!');-->
+<!--                } else {-->
+<!--                    alert('Failed to submit rating');-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => console.error('Error:', error));-->
+<!--    });-->
     document.getElementById('ratingForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+      e.preventDefault();
 
-        const score = document.getElementById('score').value;
-        const comment = document.getElementById('comment').value;
+      const score = document.getElementById('score').value;
+      const comment = document.getElementById('comment').value;
 
-        fetch('/api/ratings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: userId,
-                movieId: movieId,
-                score: score,
-                comment: comment
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    loadRatings();
-                    document.getElementById('ratingForm').reset();
-                    alert('Rating submitted successfully!');
-                } else {
-                    alert('Failed to submit rating');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+      // 调试信息
+      console.log('提交评分:', { userId, movieId, score, comment });
+
+      if (!userId || userId <= 0) {
+          alert('请先登录再评分');
+          return;
+      }
+
+      if (!movieId || movieId <= 0) {
+          alert('电影ID无效');
+          return;
+      }
+
+      fetch('/api/ratings/rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              userId: userId,
+              movieId: movieId,
+              score: parseInt(score),
+              comment: comment
+          })
+      })
+      .then(response => {
+          if (response.ok) {
+              return response.json();
+          }
+          throw new Error('评分提交失败');
+      })
+      .then(data => {
+          console.log('评分提交成功:', data);
+          loadRatings();
+          document.getElementById('ratingForm').reset();
+          alert('评分提交成功！');
+      })
+      .catch(error => {
+          console.error('错误:', error);
+          alert('评分提交失败: ' + error.message);
+      });
     });
 
     function loadRatings() {
         // Load average rating
-        fetch(`/api/movies/${movieId}/ratings/avg`)
+        fetch(`/api/ratings/movie/${movieId}/avg`)
+
             .then(res => res.json())
             .then(avg => {
                 document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';

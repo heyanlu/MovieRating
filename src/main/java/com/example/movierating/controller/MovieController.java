@@ -76,20 +76,45 @@ public class MovieController {
 
 
 
-    @GetMapping("/movies/{title}")
-    public String getMovieDetails(@PathVariable String title,
-                                  Model model,
-                                  HttpSession session) {
+//    @GetMapping("/movies/{title}")
+//    public String getMovieDetails(@PathVariable String title,
+//                                  Model model,
+//                                  HttpSession session) {
+//
+//        if (session.getAttribute("userEmail") == null) {
+//            return "redirect:/login";
+//        }
+//
+//        Movie movie = movieService.getMovieByTitle(title);
+//        System.out.println("Retrieved movie: " + (movie != null ? movie.getTitle() : "null"));
+//
+//        model.addAttribute("movie", movie);
+//        model.addAttribute("username", session.getAttribute("username"));
+//
+//        return "movie-detail";
+//    }
+    @GetMapping("/movies/{id}")
+    public String getMovieDetails(@PathVariable Integer id,
+        Model model,
+        HttpSession session) {
 
         if (session.getAttribute("userEmail") == null) {
             return "redirect:/login";
         }
 
-        Movie movie = movieService.getMovieByTitle(title);
+        Movie movie = movieService.getMovieById(id);
         System.out.println("Retrieved movie: " + (movie != null ? movie.getTitle() : "null"));
+
+        if (movie != null) {
+            // 确保 movie 对象有 movieId
+            System.out.println("Movie ID: " + movie.getMovieId());
+        }
 
         model.addAttribute("movie", movie);
         model.addAttribute("username", session.getAttribute("username"));
+
+        // 将用户ID添加到模型中，以便在JavaScript中使用
+        model.addAttribute("userId", session.getAttribute("userId"));
 
         return "movie-detail";
     }
