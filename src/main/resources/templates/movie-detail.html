@@ -53,24 +53,21 @@
             </div>
 
             <div class="mt-4">
-                    <button th:if="${inCollection}" class="btn btn-secondary" disabled>
-                        <i class="fas fa-check"></i> Already in Collection
-                    </button>
+                <button th:if="${inCollection}" class="btn btn-secondary" disabled>
+                    <i class="fas fa-check"></i> Already in Collection
+                </button>
                 <button th:unless="${inCollection}" class="btn btn-primary"
                         th:onclick="'addToCollection(' + ${movie.movieId} + ')'">
-                <i class="fas fa-bookmark"></i> Add to Collection
-                    </button>
+                    <i class="fas fa-bookmark"></i> Add to Collection
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Rating Section -->
-<!--    <hr class="my-4">-->
-<!--    <div class="row mt-4">-->
-    <!-- Rating Section -->
     <hr class="my-4">
 
-    <!-- 当view参数为rating时，只显示平均评分的简洁界面 -->
+    <!-- When view parameter is rating, show only the simplified rating interface -->
     <div th:if="${param.view != null && param.view[0] == 'rating'}" class="row mt-4">
         <div class="col-12 text-center">
             <h2>Rating Summary</h2>
@@ -88,7 +85,7 @@
         </div>
     </div>
 
-    <!-- 当view参数不是rating时，显示完整的评分表单和评论列表 -->
+    <!-- When view parameter is not rating, show the complete rating form and review list -->
     <div th:unless="${param.view != null && param.view[0] == 'rating'}" class="row mt-4">
         <div class="col-md-6">
             <h4>Rate This Movie</h4>
@@ -120,7 +117,6 @@
     </div>
 </div>
 
-
 <script th:inline="javascript">
     const movieId = [[${movie.movieId}]];
     const userId = [[${session.userId}]];
@@ -139,18 +135,18 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ movie_id: movieId, user_id: userId })
         })
-        .then(response => {
-            console.log('Add to collection response status:', response.status);
-            if (response.ok) {
-                location.reload(); // Reload to show "Already in Collection"
-            } else {
-                throw new Error('Failed to add to collection.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to add to collection: ' + error.message);
-        });
+            .then(response => {
+                console.log('Add to collection response status:', response.status);
+                if (response.ok) {
+                    location.reload(); // Reload to show "Already in Collection"
+                } else {
+                    throw new Error('Failed to add to collection.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add to collection: ' + error.message);
+            });
     }
 
     // Rating functions
@@ -160,149 +156,143 @@
         const score = document.getElementById('score').value;
         const comment = document.getElementById('comment').value;
 
-        // 验证输入
+        // Validate input
         if (!score) {
-            alert('请选择评分');
+            alert('Please select a rating');
             return;
         }
 
-        // 检查用户是否登录
+        // Check if user is logged in
         if (!userId) {
-            alert('请先登录再评分');
+            alert('Please log in to rate this movie');
             return;
         }
 
-        // 显示提交状态
+        // Show submission status
         const submitButton = this.querySelector('button[type="submit"]');
         const originalText = submitButton.innerHTML;
         submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
-        console.log('提交评分:', {
+        console.log('Submitting rating:', {
             userId: userId,
             movieId: movieId,
             score: score,
             comment: comment
         });
 
-        // 使用正确的API端点 /api/ratings/rate
+        // Use the correct API endpoint /api/ratings/rate
         fetch('/api/ratings/rate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userId: Number(userId),
                 movieId: Number(movieId),
-                score: parseInt(score),  // 确保转换为数字
+                score: parseInt(score),  // Ensure conversion to number
                 comment: comment
             })
         })
-        .then(response => {
-            console.log('评分提交响应状态:', response.status);
-            if (response.ok) {
-                return response.json().catch(() => ({})); // 处理空响应
-            } else {
-                throw new Error('评分提交失败');
-            }
-        })
-        .then(data => {
-            console.log('评分提交成功:', data);
-            loadRatings();
-            document.getElementById('ratingForm').reset();
-            alert('评分提交成功！');
-        })
-        .catch(error => {
-            console.error('错误:', error);
-            alert('评分提交失败: ' + error.message);
-        })
-        .finally(() => {
-            // 恢复按钮状态
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalText;
-        });
+            .then(response => {
+                console.log('Rating submission response status:', response.status);
+                if (response.ok) {
+                    return response.json().catch(() => ({})); // Handle empty response
+                } else {
+                    throw new Error('Failed to submit rating');
+                }
+            })
+            .then(data => {
+                console.log('Rating submitted successfully:', data);
+                loadRatings();
+                document.getElementById('ratingForm').reset();
+                alert('Rating submitted successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to submit rating: ' + error.message);
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
     });
 
     function loadRatings() {
-        console.log('加载电影ID:', movieId, '的评分');
+        console.log('Loading ratings for movie ID:', movieId);
 
-        // 使用控制器中定义的端点 /api/ratings/movie/{movieId}/avg
+        // Use the endpoint defined in the controller /api/ratings/movie/{movieId}/avg
         fetch(`/api/ratings/movie/${movieId}/avg`)
-        .then(response => {
-            console.log('平均评分响应状态:', response.status);
-            if (!response.ok) {
-                throw new Error('加载平均评分失败');
-            }
-            return response.json();
-        })
-        // .then(avg => {
-        //     console.log('平均评分:', avg);
-        //     document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
-        // })
-        .then(avg => {
-            console.log('平均评分:', avg);
-            document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
+            .then(response => {
+                console.log('Average rating response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to load average rating');
+                }
+                return response.json();
+            })
+            .then(avg => {
+                console.log('Average rating:', avg);
+                document.getElementById('avgRating').textContent = avg ? avg.toFixed(1) : '-';
 
-            // 同时更新评分圆圈（如果存在）
-            const ratingCircle = document.getElementById('ratingCircle');
-            if (ratingCircle) {
-                ratingCircle.textContent = avg ? avg.toFixed(1) : '-';
-            }
-        })
-        .catch(error => {
-            console.error('加载平均评分错误:', error);
-            document.getElementById('avgRating').textContent = '-';
-        });
+                // Also update the rating circle (if it exists)
+                const ratingCircle = document.getElementById('ratingCircle');
+                if (ratingCircle) {
+                    ratingCircle.textContent = avg ? avg.toFixed(1) : '-';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading average rating:', error);
+                document.getElementById('avgRating').textContent = '-';
+            });
 
-        // 加载所有评分 - 假设已经实现了获取所有评分的后端API
+        // Load all ratings - assuming the backend API for getting all ratings is implemented
         fetch(`/api/ratings/movie/${movieId}`)
-        .then(response => {
-            console.log('评分列表响应状态:', response.status);
-            if (!response.ok) {
-                throw new Error('加载评分列表失败');
-            }
-            return response.json();
-        })
-        .then(ratings => {
-            console.log('获取到的评分:', ratings);
-            const container = document.getElementById('ratingList');
-            container.innerHTML = '';
+            .then(response => {
+                console.log('Rating list response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to load rating list');
+                }
+                return response.json();
+            })
+            .then(ratings => {
+                console.log('Ratings received:', ratings);
+                const container = document.getElementById('ratingList');
+                container.innerHTML = '';
 
-            if (!ratings || ratings.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">暂无评论</div>';
-                return;
-            }
+                if (!ratings || ratings.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">No reviews yet</div>';
+                    return;
+                }
 
-            ratings.reverse().forEach(rating => {
-              const ratingElement = document.createElement('div');
-              ratingElement.className = 'list-group-item';
-              ratingElement.innerHTML = `
+                ratings.reverse().forEach(rating => {
+                    const ratingElement = document.createElement('div');
+                    ratingElement.className = 'list-group-item';
+                    ratingElement.innerHTML = `
                   <div class="d-flex justify-content-between">
-                      <h6 class="mb-1">${rating.username || '用户 ' + rating.userId}</h6>
+                      <h6 class="mb-1">${rating.username || 'User ' + rating.userId}</h6>
                       <small class="text-muted">${new Date(rating.createDate).toLocaleDateString()}</small>
                   </div>
                   <div class="mb-1">
                       <span class="badge bg-warning text-dark">${rating.score}/10</span>
                   </div>
-                  <p class="mb-1">${rating.comment || '没有评论内容'}</p>
+                  <p class="mb-1">${rating.comment || 'No comment content'}</p>
               `;
-              container.appendChild(ratingElement);
-          });
-        })
-        .catch(error => {
-            console.error('加载评分列表错误:', error);
-            document.getElementById('ratingList').innerHTML =
-                '<div class="alert alert-danger">加载评论失败</div>';
-        });
+                    container.appendChild(ratingElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading rating list:', error);
+                document.getElementById('ratingList').innerHTML =
+                    '<div class="alert alert-danger">Failed to load reviews</div>';
+            });
     }
 
-    // 页面加载时加载评分
+    // Load ratings when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('页面加载完成，初始化...');
+        console.log('Page loaded, initializing...');
         loadRatings();
     });
     // Load ratings when page loads
     document.addEventListener('DOMContentLoaded', loadRatings);
-
-
 </script>
 </body>
 </html>
