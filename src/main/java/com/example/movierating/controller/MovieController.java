@@ -1,9 +1,11 @@
 package com.example.movierating.controller;
 
+import com.example.movierating.Service.CollectionService;
 import com.example.movierating.Service.MovieService;
 import com.example.movierating.db.po.Movie;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,10 @@ public class MovieController {
 
     @Resource
     private MovieService movieService;
+
+    @Autowired
+    private CollectionService collectionService;
+
 
     /* ============== Thymeleaf View Endpoints ============== */
 
@@ -110,11 +116,14 @@ public class MovieController {
             System.out.println("Movie ID: " + movie.getMovieId());
         }
 
+        Integer userId = (Integer) session.getAttribute("userId");
         model.addAttribute("movie", movie);
         model.addAttribute("username", session.getAttribute("username"));
 
         // 将用户ID添加到模型中，以便在JavaScript中使用
         model.addAttribute("userId", session.getAttribute("userId"));
+        boolean inCollection = collectionService.hasUserCollectedMovie(userId, id);
+        model.addAttribute("inCollection", inCollection);
 
         return "movie-detail";
     }

@@ -53,34 +53,14 @@
             </div>
 
             <div class="mt-4">
-                <button class="btn btn-primary"
-                        onclick="addToCollection(movieId)">
-                    <i class="fas fa-bookmark"></i> Add to Collection
-                </button>
+                    <button th:if="${inCollection}" class="btn btn-secondary" disabled>
+                        <i class="fas fa-check"></i> Already in Collection
+                    </button>
+                <button th:unless="${inCollection}" class="btn btn-primary"
+                        th:onclick="'addToCollection(' + ${movie.movieId} + ')'">
+                <i class="fas fa-bookmark"></i> Add to Collection
+                    </button>
             </div>
-            <script th:inline="javascript">
-                const movieId = [[${movie.movieId}]];
-                const userId = [[${session.userId}]];
-            </script>
-            <script>
-                function addToCollection(movieId) {
-                  fetch(`/api/collections/add`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ movie_id: movieId, user_id: userId })
-                  })
-                  .then(response => {
-                    if (response.ok) {
-                      alert('Movie added to your collection!');
-                      location.reload();
-                    } else {
-                      alert('Failed to add to collection');
-                    }
-                  })
-                  .catch(error => console.error('Error:', error));
-                }
-            </script>
-
         </div>
     </div>
 
@@ -140,17 +120,17 @@
     </div>
 </div>
 
-<script>
 
+<script th:inline="javascript">
+    const movieId = [[${movie.movieId}]];
+    const userId = [[${session.userId}]];
 
-    // 添加调试信息
-    console.log('电影ID:', movieId);
-    console.log('用户ID:', userId);
+    console.log('Movie ID:', movieId);
+    console.log('User ID:', userId);
 
-    // Collection functions
     function addToCollection(movieId) {
         if (!userId) {
-            alert('请先登录再添加到收藏');
+            alert('Please log in to add this movie to your collection.');
             return;
         }
 
@@ -160,39 +140,16 @@
             body: JSON.stringify({ movie_id: movieId, user_id: userId })
         })
         .then(response => {
-            console.log('添加到收藏响应状态:', response.status);
+            console.log('Add to collection response status:', response.status);
             if (response.ok) {
-                location.reload();
+                location.reload(); // Reload to show "Already in Collection"
             } else {
-                throw new Error('添加到收藏失败');
+                throw new Error('Failed to add to collection.');
             }
         })
         .catch(error => {
-            console.error('错误:', error);
-            alert('添加到收藏失败: ' + error.message);
-        });
-    }
-
-    function removeFromCollection(movieId) {
-        if (!userId) {
-            alert('请先登录再从收藏中移除');
-            return;
-        }
-
-        fetch(`/api/collections/user/${userId}/movie/${movieId}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            console.log('从收藏中移除响应状态:', response.status);
-            if (response.ok) {
-                location.reload();
-            } else {
-                throw new Error('从收藏中移除失败');
-            }
-        })
-        .catch(error => {
-            console.error('错误:', error);
-            alert('从收藏中移除失败: ' + error.message);
+            console.error('Error:', error);
+            alert('Failed to add to collection: ' + error.message);
         });
     }
 
