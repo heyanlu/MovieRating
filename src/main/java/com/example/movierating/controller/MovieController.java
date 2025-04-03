@@ -24,22 +24,7 @@ public class MovieController {
     private CollectionService collectionService;
 
 
-    /* ============== Thymeleaf View Endpoints ============== */
-
     @GetMapping("/movies")
-//    public String getMoviesView(
-//            @RequestParam(defaultValue = "1") int page,
-//            @RequestParam(defaultValue = "12") int limit,
-//            Model model) {
-//        List<Movie> movies = movieService.getMovies(page, limit);
-//        model.addAttribute("movies", movies);
-//        model.addAttribute("currentPage", page);
-//        model.addAttribute("limit", limit);
-//        model.addAttribute("isSearch", false);
-//        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
-//
-//        return "movies";
-//    }
     public String getMoviesView(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int limit,
@@ -58,8 +43,6 @@ public class MovieController {
 
         model.addAttribute("username", session.getAttribute("username"));
 
-        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
-
         return "movies";
     }
 
@@ -75,30 +58,11 @@ public class MovieController {
         model.addAttribute("limit", limit);
         model.addAttribute("searchQuery", query);
         model.addAttribute("isSearch", true);
-        movies.forEach(movie -> movie.setPosterUrl("/images/green_book.jpg"));
 
         return "movies";
     }
 
 
-
-//    @GetMapping("/movies/{title}")
-//    public String getMovieDetails(@PathVariable String title,
-//                                  Model model,
-//                                  HttpSession session) {
-//
-//        if (session.getAttribute("userEmail") == null) {
-//            return "redirect:/login";
-//        }
-//
-//        Movie movie = movieService.getMovieByTitle(title);
-//        System.out.println("Retrieved movie: " + (movie != null ? movie.getTitle() : "null"));
-//
-//        model.addAttribute("movie", movie);
-//        model.addAttribute("username", session.getAttribute("username"));
-//
-//        return "movie-detail";
-//    }
     @GetMapping("/movies/{id}")
     public String getMovieDetails(@PathVariable Integer id,
         Model model,
@@ -112,7 +76,6 @@ public class MovieController {
         System.out.println("Retrieved movie: " + (movie != null ? movie.getTitle() : "null"));
 
         if (movie != null) {
-            // 确保 movie 对象有 movieId
             System.out.println("Movie ID: " + movie.getMovieId());
         }
 
@@ -120,7 +83,6 @@ public class MovieController {
         model.addAttribute("movie", movie);
         model.addAttribute("username", session.getAttribute("username"));
 
-        // 将用户ID添加到模型中，以便在JavaScript中使用
         model.addAttribute("userId", session.getAttribute("userId"));
         boolean inCollection = collectionService.hasUserCollectedMovie(userId, id);
         model.addAttribute("inCollection", inCollection);

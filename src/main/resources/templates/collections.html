@@ -29,7 +29,9 @@
     <div th:each="movie : ${movies}" class="col-md-3 mb-4">
       <div class="card movie-card">
         <div class="card-img-container">
-          <img th:src="@{'/images/green_book.jpg'}"
+          <img th:src="${movie.posterUrl != null and !#strings.isEmpty(movie.posterUrl)} ?
+                  ${movie.posterUrl} :
+                  @{/images/green-book.jpg}"
                th:alt="${movie.title}"
                class="img-fluid movie-poster">
         </div>

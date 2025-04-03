@@ -18,10 +18,6 @@ public class CollectionController {
     @Autowired
     private CollectionService collectionService;
 
-    /**
-     * 获取用户的收藏夹
-     * API: GET /api/collections/user/{user_id}
-     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Collection>> getUserCollection(@PathVariable("userId") Integer userId) {
         List<Collection> collections = collectionService.getUserCollection(userId);
@@ -31,10 +27,7 @@ public class CollectionController {
         return new ResponseEntity<>(collections, HttpStatus.OK);
     }
 
-    /**
-     * 添加电影到用户收藏夹
-     * API: POST /api/collections/add
-     */
+
     @PostMapping("/add")
     public ResponseEntity<Collection> addToCollection(@RequestBody Map<String, Object> request) {
         Integer userId = (Integer) request.get("user_id");
@@ -48,10 +41,7 @@ public class CollectionController {
         return new ResponseEntity<>(collection, HttpStatus.CREATED);
     }
 
-    /**
-     * 查询用户是否收藏了特定电影
-     * API: GET /api/collections/user/{user_id}/movie/{movie_id}
-     */
+
     @GetMapping("/user/{userId}/movie/{movieId}")
     public ResponseEntity<Boolean> hasUserCollectedMovie(
         @PathVariable("userId") Integer userId,
@@ -60,10 +50,7 @@ public class CollectionController {
         return new ResponseEntity<>(isCollected, HttpStatus.OK);
     }
 
-    /**
-     * 从用户收藏夹中移除电影
-     * API: DELETE /api/collections/user/{user_id}/movie/{movie_id}
-     */
+
     @DeleteMapping("/user/{userId}/movie/{movieId}")
     public ResponseEntity<Map<String, Object>> removeMovieFromCollection(
         @PathVariable("userId") Integer userId,

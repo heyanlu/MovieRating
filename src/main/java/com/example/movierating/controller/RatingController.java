@@ -18,15 +18,6 @@ public class RatingController {
     @Autowired
     private RatingService ratingService;
 
-    /**
-     * 添加或更新评分
-     * API: POST /api/ratings/rate
-     */
-//    @PostMapping("/rate")
-//    public ResponseEntity<Rating> addOrUpdateRating(@RequestBody Rating rating) {
-//        Rating savedRating = ratingService.addOrUpdateRating(rating);
-//        return ResponseEntity.ok(savedRating);
-//    }
 
     @PostMapping("/rate")
     public ResponseEntity<Rating> addOrUpdateRating(@RequestBody String jsonBody, HttpServletRequest request) {
@@ -40,10 +31,7 @@ public class RatingController {
         }
     }
 
-    /**
-     * 获取电影的平均评分
-     * API: GET /api/ratings/movie/{movieId}/avg
-     */
+
     @GetMapping("/movie/{movieId}/avg")
     public ResponseEntity<Double> getMovieAvgRating(@PathVariable Integer movieId) {
         // 使用 ratingService 来计算或获取电影的平均评分
@@ -54,10 +42,7 @@ public class RatingController {
         return ResponseEntity.ok(avgRating);
     }
 
-    /**
-     * 获取电影的所有评分和评论
-     * API: GET /api/ratings/movie/{movieId}
-     */
+
     @GetMapping("/movie/{movieId}")
     public ResponseEntity<List<Rating>> getMovieRatings(@PathVariable Integer movieId) {
         List<Rating> ratings = ratingService.getMovieRatings(movieId);

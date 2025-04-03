@@ -1,5 +1,7 @@
 package com.example.movierating.db.po;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+
 import java.util.Date;
 
 public class Movie {
